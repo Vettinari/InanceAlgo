@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Tuple
 
 import gym
-from gym.core import ActType, ObsType
+from gym.core import ObsType
 
 from DataProcessing.data_processor import DataProcessor
 from risk_manager import RiskManager
@@ -14,7 +14,7 @@ class TradeGym(gym.Env, ABC):
         self.current_tech = None
         self.reward = 0
         self.current_step = 0
-        self.terminal = False
+        self.done = False
         self.reward_scaling = reward_scaling
         self.state = None
 
@@ -32,20 +32,14 @@ class TradeGym(gym.Env, ABC):
         # Get action to RiskManager for execution -> self.reward = ActionReward + WalletReward
         # Generate new state(update self.state) and pass the ohlct data to the RiskManager
         # Return self.state, self.reward, terminal_state, info
-        self.terminal = self.current_step >= (self.max_steps - 1) or self.risk_manager.wallet.game_over  # OK
+        self.done = self.current_step >= (self.max_steps - 1) or self.risk_manager.wallet.game_over  # OK
 
-        if self.terminal:
-            if self.risk_manager.wallet.position is not None:
-                self.risk_manager.wallet.cancel_position()
-                self.state = self.generate_state()
-                self.reward = self.risk_manager.get_rewards(objects=False)
-            return self.state, self.reward, self.terminal, {}  # OK
+        if self.done:
+            return None, None, self.done, None
 
         else:
-            self.risk_manager.wallet_step(current_ohlct=self.current_ohlct)  # might produce rewards
-            self.risk_manager.execute_action(action_index=int(action),
-                                             open_price=self.current_ohlct['close'],
-                                             current_atr=self.current_tech['atr'])
+            current_reward = self.reward
+            self.risk_manager.execute_action(action_index=int(action), current_atr=self.current_tech['atr'])
             self.generate_state()
             # LAST
             # self.reward = (end_reward - begin_reward) * self.reward_scaling
@@ -55,7 +49,7 @@ class TradeGym(gym.Env, ABC):
             # update env data (state and ohlct_dict)
             self.update_wallet_and_env()
 
-            return self.state, self.reward, self.terminal, {}
+            return self.state, self.reward, self.done, {}
 
     def update_wallet_and_env(self):
         pass
@@ -65,6 +59,8 @@ class TradeGym(gym.Env, ABC):
         pass
 
     def reset(self):
+        self.reward = 0
+        self.done = False
         self.data_processor.reset()
         self.update_ohlct()
         self.update_wallet_and_env()

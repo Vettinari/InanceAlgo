@@ -1,7 +1,9 @@
 import Utils
 import pandas as pd
+
+from DataProcessing.data_processor import OHLCT
 from positions import Position, Long, Short
-from reward_system import WalletReward
+from reward_system import TransactionReward, IntermediateReward
 
 
 class Wallet:
@@ -17,7 +19,7 @@ class Wallet:
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
 
         self.position: Position = None
-        self.current_ohlct: dict = None
+        self.current_ohlct: OHLCT = None
         self.closed_positions_dataframe = pd.DataFrame({"open_time": [],
                                                         "close_time": [],
                                                         "volume": [],
@@ -32,16 +34,8 @@ class Wallet:
                                                         "is_stop_loss": [],
                                                         "is_profit": []}, index=[])
         self.game_over = False
-        self.reward: WalletReward = WalletReward()
-
-        # REWARD SYSTEM
-        # 1. Observation
-        # ACT: LONG -> open_long -> yield_rewards
-        # ACT: SHORT -> open_short -> yield_reward
-        # ACT: CLOSE -> close_position -> yield_reward
-        # ACT: HOLD -> nothing -> yield_reward
-        # 2. Updated _observation
-        # step() -> yield_rewards
+        self.transaction_reward: TransactionReward = None
+        self.intermediate_reward: IntermediateReward = None
 
     def reserve_margin(self, amount: float):
         if amount > self.margin_balance['free']:
@@ -56,57 +50,61 @@ class Wallet:
         self.margin_balance['free'] += self.margin_balance['margin']
         self.margin_balance['margin'] = 0
 
-    def open_long(self, open_price: float, stop_loss: float,
-                  risk_reward_ratio: float, position_risk: float):
-        self._prepare_to_open_position(cancel_position_type='short')  # Generates wallet reward
+    def open_long(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
+        transaction_reward = self._prepare_to_open_position(cancel_position_type='short')  # Generates wallet reward
         self.position = Long(ticker=self.ticker,
-                             open_time=self.current_ohlct['time'],
-                             open_price=open_price,
-                             stop_loss=stop_loss,
+                             open_time=self.current_ohlct.time,
+                             open_price=self.current_ohlct.close,
+                             stop_loss=self.current_ohlct.close - stop_loss_delta,
                              risk_reward_ratio=risk_reward_ratio,
                              position_risk=position_risk)
         self.reserve_margin(amount=self.position.margin)
+        return transaction_reward
 
-    def open_short(self, open_price: float, stop_loss: float,
-                   risk_reward_ratio: float, position_risk: float):
-        self._prepare_to_open_position(cancel_position_type='long')  # Generates wallet reward
+    def open_short(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
+        transaction_reward = self._prepare_to_open_position(cancel_position_type='long')  # Generates wallet reward
         self.position = Short(ticker=self.ticker,
-                              open_time=self.current_ohlct['time'],
-                              open_price=open_price,
-                              stop_loss=stop_loss,
+                              open_time=self.current_ohlct.time,
+                              open_price=self.current_ohlct.close,
+                              stop_loss=self.current_ohlct.close + stop_loss_delta,
                               risk_reward_ratio=risk_reward_ratio,
                               position_risk=position_risk)
         self.reserve_margin(amount=self.position.margin)
+        return transaction_reward
 
     def position_close(self):
         self.position.is_closed = True
-        self.position.close_price = self.current_ohlct['close']
-        self.position.close_time = self.current_ohlct['time']
+        self.position.close_price = self.current_ohlct.close
+        self.position.close_time = self.current_ohlct.time
         self.margin_balance['free'] += self.position.profit
         self.free_margin()
         self.__update_dataframe(position=self.position)
-        # reward calculation
-        self.reward = WalletReward(position=self.position)
+        transaction_reward = TransactionReward(position=self.position)
         self.position = None
 
-    def update_wallet(self, ohlct_dict: dict):
+        return transaction_reward
+
+    def update_wallet(self, ohlct: OHLCT):
         # Update ohlct
-        self.current_ohlct = ohlct_dict
+        self.current_ohlct = ohlct
         self.update_position()
         self.check_and_close_position()
 
     def update_position(self):
         if self.position is not None:
-            self.position.update_position(ohlct_dict=self.current_ohlct)
+            self.position.update_position(ohlct=self.current_ohlct)
+        self.update_rewards()
 
     def check_and_close_position(self):
         if self.position is not None and self.position.is_closed:
             self.margin_balance['free'] += self.position.profit
             self.free_margin()
             self.__update_dataframe(position=self.position)
-            # reward calculation
-            self.reward = WalletReward(position=self.position)
             self.position = None
+
+    def update_rewards(self):
+        self.intermediate_reward = IntermediateReward(position=self.position)
+        self.transaction_reward = TransactionReward(position=self.position)
 
     def get_current_state(self):
         current_position_type = [int(self.position.type == 'long'), int(self.position.type == 'short')]
@@ -179,11 +177,12 @@ class Wallet:
                     f"{prefix}_combo_score": round(0.01 * accuracy * self.total_balance(), 4)
                 }
 
-    def reset(self, current_ohlct: dict):
+    def reset(self, ohlct: OHLCT):
         self.position = None
         self.game_over = False
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
-        self.reward = WalletReward()
+        self.transaction_reward: TransactionReward = TransactionReward()
+        self.intermediate_reward: IntermediateReward = IntermediateReward(position=self.position, scaling_factor=0)
         self.closed_positions_dataframe = pd.DataFrame({"open_time": [],
                                                         "close_time": [],
                                                         "volume": [],
@@ -197,16 +196,16 @@ class Wallet:
                                                         "is_closed": [],
                                                         "is_stop_loss": [],
                                                         "is_profit": []}, index=[])
-        self.update_wallet(ohlct_dict=current_ohlct)
+        self.update_wallet(ohlct=ohlct)
 
     def cancel_position(self):
         self.margin_balance['free'] += self.position.margin
         self.position = None
 
     def _prepare_to_open_position(self, cancel_position_type):
-        self.reward = WalletReward()
         if self.position is not None and self.position.type == cancel_position_type:
-            self.reward = self.position_close()
+            return self.position_close()
+        return TransactionReward()
 
     def __update_dataframe(self, position: Position):
         self.closed_positions.append(position)
@@ -223,9 +222,6 @@ class Wallet:
                                                    "is_closed": position.is_closed,
                                                    "is_stop_loss": position.is_stop_loss,
                                                    "is_profit": position.is_stop_profit}
-
-    def reset_reward(self):
-        self.reward = WalletReward()
 
     def __repr__(self):
         return f"<Wallet: ticker={self.ticker}, initial_balance={self.initial_balance}, margin_balance={self.margin_balance}>"

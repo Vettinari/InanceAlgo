@@ -1,6 +1,8 @@
 from pprint import pprint
-from typing import Dict, List, Optional, Tuple, Union
-from reward_system import ActionReward, WalletReward
+from typing import Optional
+
+from DataProcessing.data_processor import OHLCT
+from reward_system import ActionReward, TransactionReward, IntermediateReward
 from wallet import Wallet
 
 
@@ -17,7 +19,7 @@ class Action:
 class RiskManager:
     def __init__(self, ticker: str, initial_balance: float, atr_stop_loss_ratios: list,
                  risk_reward_ratios: list = None, manual_position_closing: bool = True,
-                 portfolio_risk: float = None, stop_loss_type='atr', atr_sl=None, pip_sl=None, wallet=None):
+                 portfolio_risk: float = None, stop_loss_type='atr', wallet=None):
         self.initial_balance = initial_balance
         self.atr_stop_loss_ratios = [2,
                                      3] if atr_stop_loss_ratios is None else atr_stop_loss_ratios  # ATR multiplier/ percent
@@ -27,8 +29,10 @@ class RiskManager:
         self.wallet = Wallet(ticker=ticker, initial_balance=initial_balance) if wallet is None else wallet
         self.action_dict = self.generate_action_space()
         self.stop_loss_type = stop_loss_type
+        # Rewards
         self.action_reward: ActionReward = ActionReward(reward=0)
-        self.wallet_reward: WalletReward = WalletReward()
+        self.transaction_reward: TransactionReward = TransactionReward()
+        self.intermediate_reward: IntermediateReward = IntermediateReward(position=None, scaling_factor=None)
 
     def generate_action_space(self):
         actions = ['long', 'short', 'hold']
@@ -61,44 +65,43 @@ class RiskManager:
         self.action_reward = ActionReward(reward=0.1)
         return True
 
-    def execute_action(self, action_index: int, open_price, current_atr):
+    def execute_action(self, action_index: int, current_atr):
         action = self.action_dict[action_index]
         validation = self.validate_action(action=action.action)
-
-        self.wallet_reward = WalletReward()
-        stop_loss_delta = round(current_atr * action.sl, 5)
 
         if validation:
             if action.action == "hold":
                 pass
             elif action.action == "close":
-                self.wallet_reward = self.wallet.position_close()
+                self.wallet.position_close()
             elif action.action == "long":
-
-                self.wallet_reward = self.wallet.open_long(open_price=open_price,
-                                                           stop_loss=open_price - stop_loss_delta,
-                                                           risk_reward_ratio=action.rr,
-                                                           position_risk=self.trade_risk)
+                stop_loss_delta = round(current_atr * action.sl, 5)
+                self.wallet.open_long(stop_loss_delta=stop_loss_delta,
+                                      risk_reward_ratio=action.rr,
+                                      position_risk=self.trade_risk)
             elif action.action == "short":
-                self.wallet_reward = self.wallet.open_short(open_price=open_price,
-                                                            stop_loss=open_price + stop_loss_delta,
-                                                            risk_reward_ratio=action.rr,
-                                                            position_risk=self.trade_risk)
+                stop_loss_delta = round(current_atr * action.sl, 5)
+                self.wallet.open_short(stop_loss_delta=stop_loss_delta,
+                                       risk_reward_ratio=action.rr,
+                                       position_risk=self.trade_risk)
+
+        self.transaction_reward = self.wallet.transaction_reward
+        self.intermediate_reward = self.wallet.intermediate_reward
 
     def yield_rewards(self, objects=True):
         if objects:
-            return [self.action_reward, self.wallet_reward]
+            return [self.action_reward, self.transaction_reward, self.intermediate_reward]
         else:
-            return self.action_reward.reward + self.wallet_reward.reward
+            return self.action_reward.reward, self.transaction_reward.reward, self.intermediate_reward.reward
 
     def calculate_stop_loss_delta(self, sl_value, current_atr):
         return
 
-    def wallet_reset(self, current_ohlct):
-        self.wallet.reset(current_ohlct)
+    def wallet_reset(self, ohlct):
+        self.wallet.reset(ohlct)
 
-    def wallet_step(self, current_ohlct):
-        self.wallet.update_wallet(ohlct_dict=current_ohlct)
+    def wallet_step(self, ohlct: OHLCT):
+        self.wallet.update_wallet(ohlct=ohlct)
 
     def info(self):
         print('Risk manager:')
@@ -108,3 +111,6 @@ class RiskManager:
         print('Trade risk:', self.trade_risk)
         print('Action space:', len(self.generate_action_space()))
         pprint(self.generate_action_space())
+
+    def rewards_info(self):
+        print('RiskManager Rewards:', [str(reward) for reward in self.yield_rewards(True)])

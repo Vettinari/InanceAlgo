@@ -1,3 +1,5 @@
+from typing import Optional
+
 from positions import Position
 
 
@@ -7,11 +9,7 @@ class Reward:
     reward_type = "abstract"
 
     def __init__(self):
-        self._reward = 0
-
-    @property
-    def reward(self):
-        return self._reward
+        self.reward = 0
 
     def calculate_reward(self):
         pass
@@ -20,21 +18,25 @@ class Reward:
         return f"{self.reward_type}: {self.reward}"
 
 
-class WalletReward(Reward):
+class TransactionReward(Reward):
     """Reward for wallet actions, such as closing positions."""
 
-    reward_type = "WalletReward"
+    reward_type = "TransactionReward"
 
-    def __init__(self, position: Position = None):
+    def __init__(self, position=None):
         super().__init__()
         self.position = position
-        self._reward = 0 if position is None else self.calculate_reward()
+        self.reward = 0 if position is None else self.calculate_reward()
 
     def calculate_reward(self):
-        if self.position.is_stop_profit:
+        if self.position.is_stop_profit and self.position.is_closed:
             return self.position.risk_reward_ratio * self.position.profit
-        elif self.position.is_stop_loss:
+        elif self.position.is_stop_loss and self.position.is_closed:
             return self.position.profit
+        elif self.position.is_closed:
+            return self.position.profit
+        else:
+            return 0
 
 
 class ActionReward(Reward):
@@ -44,4 +46,17 @@ class ActionReward(Reward):
 
     def __init__(self, reward):
         super().__init__()
-        self._reward = reward
+        self.reward = reward
+
+
+class IntermediateReward(Reward):
+    reward_type = "IntermediateReward"
+
+    def __init__(self, position: Optional[Position], scaling_factor: Optional[float] = None):
+        super().__init__()
+        self.unrealized_profit = 0 if position is None else position.unrealized_profit
+        self.scaling_factor = 0.001 if scaling_factor is None else scaling_factor
+        self.reward = 0 if position is None else self.calculate_reward()
+
+    def calculate_reward(self):
+        return round(self.unrealized_profit * self.scaling_factor, 5)

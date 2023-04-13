@@ -2,6 +2,7 @@ import operator
 from typing import Callable
 
 import Utils
+from DataProcessing.data_processor import OHLCT
 
 XTB = {"EURUSD": {"one_lot_value": 100000,
                   "leverage": 30,
@@ -102,8 +103,14 @@ class Position:
         self.order_number = None
         self.type = "Abstract"
 
-    def update_position(self, ohlct_dict: dict) -> None:
+    def update_position(self, ohlct: OHLCT) -> None:
         pass
+
+    @property
+    def unrealized_profit(self):
+        if self.is_stop_profit is False and self.is_stop_loss is False and self.is_closed is False:
+            return self.profit
+        return 0
 
     def update_profit(self, current_price) -> None:
         pass
@@ -116,7 +123,7 @@ class Position:
         print(f'Open at: {self.open_time} - 1:{self.leverage} leverage.')
         print(f'Open price: {self.open_price}$ - Volume: {self.volume}')
         print(f'Stop loss: {self.stop_loss}$ - Stop profit: {self.stop_profit}$ - RR: {self.risk_reward_ratio}x')
-        print(f'Calculated profit: {self.profit}$ - Position risk: {self.position_risk}$')
+        print(f'Unrealized profit: {self.unrealized_profit}$ - Position risk: {self.position_risk}$')
         print(f'Margin: {self.margin}$ - Contract value: {self.contract_value}$')
         Utils.printline(text="", size=60, line_char="-", blank=True, title=False, test=True)
 
@@ -133,14 +140,14 @@ class Position:
         self.open_price = new_price
         self.update_profit(current_price=new_price)
 
-    def _stop_loss_hit(self, ohlct_dict: dict, comparator: Callable) -> bool:
+    def _stop_loss_hit(self, ohlct: OHLCT, comparator: Callable) -> bool:
         return any(
-            comparator(ohlct_dict[key], self.stop_loss) for key in ['open', 'high', 'low', 'close']
+            comparator(ohlct.__getattribute__(key), self.stop_loss) for key in ['open', 'high', 'low', 'close']
         )
 
-    def _stop_profit_hit(self, ohlct_dict: dict, comparator: Callable) -> bool:
+    def _stop_profit_hit(self, ohlct: OHLCT, comparator: Callable) -> bool:
         return any(
-            comparator(ohlct_dict[key], self.stop_profit) for key in ['open', 'high', 'low', 'close']
+            comparator(ohlct.__getattribute__(key), self.stop_profit) for key in ['open', 'high', 'low', 'close']
         )
 
     @property
@@ -171,29 +178,29 @@ class Long(Position):
         self.contract_value = int(self.margin * self.leverage)
         self.type = 'long'
 
-    def update_position(self, ohlct_dict: dict) -> None:
+    def update_position(self, ohlct: OHLCT) -> None:
         # CHECK CONTINUITY
-        if self.__stop_loss_hit(ohlct_dict):
+        if self.__stop_loss_hit(ohlct):
             self.is_closed = True
             self.is_stop_loss = True
             self.close_price = self.stop_loss
-            self.close_time = ohlct_dict['time']
+            self.close_time = ohlct.time
             self.profit = -self.position_risk
         else:
-            if self.__stop_profit_hit(ohlct_dict):
+            if self.__stop_profit_hit(ohlct):
                 self.is_closed = True
                 self.is_stop_profit = True
                 self.close_price = self.stop_profit
-                self.close_time = ohlct_dict['time']
+                self.close_time = ohlct.time
                 self.profit = self.position_gain
             else:
-                self.update_profit(current_price=ohlct_dict['close'])
+                self.update_profit(current_price=ohlct.close)
 
-    def __stop_loss_hit(self, ohlct_dict: dict) -> bool:
-        return super()._stop_loss_hit(ohlct_dict, operator.le)
+    def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
+        return super()._stop_loss_hit(ohlct, operator.le)
 
-    def __stop_profit_hit(self, ohlct_dict: dict) -> bool:
-        return super()._stop_profit_hit(ohlct_dict, operator.ge)
+    def __stop_profit_hit(self, ohlct: OHLCT) -> bool:
+        return super()._stop_profit_hit(ohlct, operator.ge)
 
     def update_profit(self, current_price) -> None:
         eur_usd_pip_value = 1 / current_price
@@ -220,29 +227,29 @@ class Short(Position):
         self.contract_value = int(self.margin * self.leverage)
         self.type = 'short'
 
-    def update_position(self, ohlct_dict: dict) -> None:
+    def update_position(self, ohlct: OHLCT) -> None:
         # CHECK CONTINUITY
-        if self.__stop_loss_hit(ohlct_dict):
+        if self.__stop_loss_hit(ohlct):
             self.is_closed = True
             self.is_stop_loss = True
             self.close_price = self.stop_loss
-            self.close_time = ohlct_dict['time']
+            self.close_time = ohlct.time
             self.profit = -self.position_risk
         else:
-            if self.__stop_profit_hit(ohlct_dict):
+            if self.__stop_profit_hit(ohlct):
                 self.is_closed = True
                 self.is_stop_profit = True
                 self.close_price = self.stop_profit
-                self.close_time = ohlct_dict['time']
+                self.close_time = ohlct.time
                 self.profit = self.position_gain
             else:
-                self.update_profit(current_price=ohlct_dict['close'])
+                self.update_profit(current_price=ohlct.close)
 
-    def __stop_loss_hit(self, ohlct_dict: dict) -> bool:
-        return super()._stop_loss_hit(ohlct_dict, operator.ge)
+    def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
+        return super()._stop_loss_hit(ohlct, operator.ge)
 
-    def __stop_profit_hit(self, ohlct_dict: dict) -> bool:
-        return super()._stop_profit_hit(ohlct_dict, operator.le)
+    def __stop_profit_hit(self, ohlct: OHLCT) -> bool:
+        return super()._stop_profit_hit(ohlct, operator.le)
 
     def update_profit(self, current_price) -> None:
         eur_usd_pip_value = 1 / current_price

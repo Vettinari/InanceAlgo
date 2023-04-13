@@ -1,0 +1,8 @@
+
+NEXT STEP
+
+Transaction reward Wallet TransactionReward: None
+::::::::::::::::::::::: Wallet info :::::::::::::::::::::::
+Free margin: 10022.87$ | Margin: 0$
+::::::::::::::::::: No opened positions :::::::::::::::::::
+RiskManager Rewards: ['ActionReward: 0.1', 'TransactionReward: None', 'IntermediateReward: 0']
