@@ -14,18 +14,46 @@ if __name__ == '__main__':
                      risk_reward_ratios=[1.5, 2], atr_stop_loss_ratios=[1.5],
                      manual_position_closing=True)
     rm.wallet_reset(ohlct=dp.ohlct(0))
-    rm.execute_action(action_index=0, current_atr=0.001)  # LONG
-    rm.wallet.info()
-    rm.rewards_info()
+    # Generate state
+    rm.execute_action(action_index=2, current_atr=0.001)  # LONG
+    # rm.rewards_info()
+    # rm.wallet.info()
+
     print('\nNEXT STEP\n')
-    rm.wallet_step(ohlct=dp.ohlct(1))
-    rm.execute_action(action_index=4, current_atr=0.001)  # LONG
-    rm.wallet.info()
-    rm.rewards_info()
+    rm.wallet_step(ohlct=dp.ohlct(2))
+    # Generate state
+    rm.execute_action(action_index=0, current_atr=0.001)  # LONG
+    # rm.rewards_info()
+    # rm.wallet.info()
+    space = """"""
+    # SHORTS
+    # - (2)short intermediate_rew(4), long - OK
+    # - (2)short intermediate_rew(4), short - OK
+    # - (2)short intermediate_rew(4), hold - OK
+    # - (2)short transaction_rew(4), close - OK
+    # - (10)short stop_profit_rew(12), long - OK
+    # - (10)short stop_profit_rew(12), short - OK
+    # - (10)short stop_profit_rew(12), hold - OK
+    # - (10)short stop_profit_rew(12), close - OK
+    # - (0)short stop_loss_rew(2), long -
+    # - (0)short stop_loss_rew(2), short -
+    # - (0)short stop_loss_rew(2), hold -
+    # close on empty wallet
+    # hold on empty wallet
 
     # Repeating actions - OK
-    # LONG/SHORT TRANSACTION REWARD - OK
-    # LONG/SHORT INTERMEDIATE REWARD -
+    # LONGS
+    # - (0)long intermediate_rew(1), long - OK
+    # - (0)long intermediate_rew(1), short - OK
+    # - (0)long intermediate_rew(1), hold - OK
+    # - (0)long transaction_rew(1), close - OK
+    # - (0)long stop_profit_rew(2), long - OK
+    # - (0)long stop_profit_rew(2), short - OK
+    # - (0)long stop_profit_rew(2), hold - OK
+    # - (0)long stop_profit_rew(2), close - OK
+    # - (2)long stop_loss_rew(4), long - OK
+    # - (2)long stop_loss_rew, short - OK
+    # - (2)long stop_loss_rew, hold - OK
 
     # rm.wallet.info()
 
@@ -38,7 +66,7 @@ if __name__ == '__main__':
     # 5: Action(close, sl: None, rr: None)}
 
     # Wallet class opens the position according to RiskManager specs
-    # Environment updates the wallet so it can check the position state.
+    # Environment updates the wallet, so it can check the position state.
 
     # position.update_position({'open': 1.0,
     #                           'high': 1.1,

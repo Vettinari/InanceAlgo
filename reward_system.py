@@ -23,7 +23,7 @@ class TransactionReward(Reward):
 
     reward_type = "TransactionReward"
 
-    def __init__(self, position=None):
+    def __init__(self, position: Optional[Position] = None):
         super().__init__()
         self.position = position
         self.reward = 0 if position is None else self.calculate_reward()
@@ -52,7 +52,9 @@ class ActionReward(Reward):
 class IntermediateReward(Reward):
     reward_type = "IntermediateReward"
 
-    def __init__(self, position: Optional[Position], scaling_factor: Optional[float] = None):
+    def __init__(self,
+                 position: Optional[Position] = None,
+                 scaling_factor: Optional[float] = None):
         super().__init__()
         self.unrealized_profit = 0 if position is None else position.unrealized_profit
         self.scaling_factor = 0.001 if scaling_factor is None else scaling_factor

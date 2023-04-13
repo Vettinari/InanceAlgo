@@ -2,21 +2,25 @@ from abc import ABC
 from typing import Tuple
 
 import gym
+import numpy as np
 from gym.core import ObsType
 
-from DataProcessing.data_processor import DataProcessor
+from DataProcessing.data_processor import DataProcessor, OHLCT
 from risk_manager import RiskManager
 
 
 class TradeGym(gym.Env, ABC):
-    def __init__(self, risk_manager: RiskManager, reward_scaling):
-        self.current_ohlct = None
-        self.current_tech = None
-        self.reward = 0
-        self.current_step = 0
+    def __init__(self, risk_manager: RiskManager, reward_scaling: float):
         self.done = False
-        self.reward_scaling = reward_scaling
+        self.current_step = 0
+        self.current_ohlct: OHLCT = None
         self.state = None
+        self.data = None
+        self.tech = None
+
+        # Rewards
+        self.reward_scaling = reward_scaling
+        self.reward = 0
 
         # Objects
         self.risk_manager: RiskManager = risk_manager
@@ -25,49 +29,46 @@ class TradeGym(gym.Env, ABC):
         # TODO
         self.continuous = False
         self.max_steps = -999
+        self.reset()
 
-    def step(self, action) -> Tuple[ObsType, float, bool, bool, dict]:
-        # RiskManager has old_state in his memory
-        # beginning_reward = self.reward
-        # Get action to RiskManager for execution -> self.reward = ActionReward + WalletReward
-        # Generate new state(update self.state) and pass the ohlct data to the RiskManager
-        # Return self.state, self.reward, terminal_state, info
+    def step(self, action) -> Tuple[np.array, float, bool, bool, dict]:
         self.done = self.current_step >= (self.max_steps - 1) or self.risk_manager.wallet.game_over  # OK
 
         if self.done:
-            return None, None, self.done, None
+            return self.state, self.reward, self.done, {}
 
         else:
-            current_reward = self.reward
-            self.risk_manager.execute_action(action_index=int(action), current_atr=self.current_tech['atr'])
-            self.generate_state()
-            # LAST
-            # self.reward = (end_reward - begin_reward) * self.reward_scaling
-
-            # state: s -> s+1
+            start_reward = self.reward
+            self.risk_manager.execute_action(action_index=int(action),
+                                             current_atr=self.tech.iloc[self.current_step]['atr'])
+            # state: S -> S+1
             self.current_step += 1
-            # update env data (state and ohlct_dict)
+            # Update wallet and environment elements for state generation
             self.update_wallet_and_env()
+            # Generate state from wallet and data in environment
+            self.generate_state()
+            # Calculate transition reward
+            end_reward = sum(self.risk_manager.yield_rewards(False))
+            self.reward = (end_reward - start_reward) * self.reward_scaling
 
             return self.state, self.reward, self.done, {}
 
     def update_wallet_and_env(self):
-        pass
-
-    def update_ohlct(self):
-        self.current_ohlct = self.data_processor.current_ohlct
-        pass
+        self.current_ohlct = self.data_processor.ohlct(current_step=self.current_step)
+        self.risk_manager.wallet_step(ohlct=self.current_ohlct)
 
     def reset(self):
-        self.reward = 0
         self.done = False
-        self.data_processor.reset()
-        self.update_ohlct()
-        self.update_wallet_and_env()
-        self.risk_manager.wallet_reset(current_ohlct=self.current_ohlct)
+        self.reward = 0
+        self.current_step = 0
+        self.current_ohlct = self.data_processor.ohlct(current_step=self.current_step)
+        self.risk_manager.wallet_reset(ohlct=self.current_ohlct)
+        self.generate_state()
         return self.state
 
     def generate_state(self):
+        wallet_state = self.risk_manager.wallet.get_current_state()
+        data_state, tech_state = self.data_processor.get_state(current_step=self.current_step)
         return 0
 
 # class XTBTradingEnv(gym.Env):

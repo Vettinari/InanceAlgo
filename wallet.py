@@ -1,6 +1,5 @@
 import Utils
 import pandas as pd
-
 from DataProcessing.data_processor import OHLCT
 from positions import Position, Long, Short
 from reward_system import TransactionReward, IntermediateReward
@@ -37,21 +36,21 @@ class Wallet:
         self.transaction_reward: TransactionReward = None
         self.intermediate_reward: IntermediateReward = None
 
-    def reserve_margin(self, amount: float):
+    def reserve_margin(self, amount):
+        amount = round(amount, 2)
         if amount > self.margin_balance['free']:
             self.game_over = True
-            return
         else:
             self.margin_balance['free'] -= amount
             self.margin_balance['margin'] = amount
-            return
 
     def free_margin(self):
         self.margin_balance['free'] += self.margin_balance['margin']
+        self.margin_balance['free'] = round(self.margin_balance['free'], 2)
         self.margin_balance['margin'] = 0
 
     def open_long(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
-        transaction_reward = self._prepare_to_open_position(cancel_position_type='short')  # Generates wallet reward
+        self._prepare_to_open_position(cancel_position_type='short')  # Generates wallet reward
         self.position = Long(ticker=self.ticker,
                              open_time=self.current_ohlct.time,
                              open_price=self.current_ohlct.close,
@@ -59,10 +58,9 @@ class Wallet:
                              risk_reward_ratio=risk_reward_ratio,
                              position_risk=position_risk)
         self.reserve_margin(amount=self.position.margin)
-        return transaction_reward
 
     def open_short(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
-        transaction_reward = self._prepare_to_open_position(cancel_position_type='long')  # Generates wallet reward
+        self._prepare_to_open_position(cancel_position_type='long')  # Generates wallet reward
         self.position = Short(ticker=self.ticker,
                               open_time=self.current_ohlct.time,
                               open_price=self.current_ohlct.close,
@@ -70,7 +68,6 @@ class Wallet:
                               risk_reward_ratio=risk_reward_ratio,
                               position_risk=position_risk)
         self.reserve_margin(amount=self.position.margin)
-        return transaction_reward
 
     def position_close(self):
         self.position.is_closed = True
@@ -79,10 +76,9 @@ class Wallet:
         self.margin_balance['free'] += self.position.profit
         self.free_margin()
         self.__update_dataframe(position=self.position)
-        transaction_reward = TransactionReward(position=self.position)
+        self.transaction_reward = TransactionReward(position=self.position)
         self.position = None
-
-        return transaction_reward
+        self.intermediate_reward = IntermediateReward(position=self.position)
 
     def update_wallet(self, ohlct: OHLCT):
         # Update ohlct
@@ -93,7 +89,8 @@ class Wallet:
     def update_position(self):
         if self.position is not None:
             self.position.update_position(ohlct=self.current_ohlct)
-        self.update_rewards()
+            self.intermediate_reward = IntermediateReward(position=self.position)
+            self.transaction_reward = TransactionReward(position=self.position)
 
     def check_and_close_position(self):
         if self.position is not None and self.position.is_closed:
@@ -102,15 +99,13 @@ class Wallet:
             self.__update_dataframe(position=self.position)
             self.position = None
 
-    def update_rewards(self):
-        self.intermediate_reward = IntermediateReward(position=self.position)
-        self.transaction_reward = TransactionReward(position=self.position)
-
-    def get_current_state(self):
-        current_position_type = [int(self.position.type == 'long'), int(self.position.type == 'short')]
-        position_state = [0, 0, 0] if self.position is None else self.position.state
+    @property
+    def state(self):
+        position_type = [0, 0] if self.position is None else [int(self.position.type == 'long'),
+                                                              int(self.position.type == 'short')]
+        position_state = self.position.state if self.position is not None else [0, 0, 0, 0]
         state = [self.total_balance / (self.initial_balance * 10),
-                 current_position_type,
+                 position_type,
                  position_state]
 
         return state
@@ -123,10 +118,20 @@ class Wallet:
     def total_balance(self) -> float:
         return self.margin_balance['free'] + self.margin_balance['margin']
 
+    @property
+    def unrealized_profit(self):
+        if self.position is None:
+            return 0
+        else:
+            return self.position.unrealized_profit
+
     def info(self) -> None:
         if not self.game_over:
             Utils.printline(text='Wallet info', title=False, line_char=":", size=60)
-            print(f"Free margin: {self.margin_balance['free']}$ | Margin: {self.margin_balance['margin']}$")
+            print(
+                f"Free: {self.margin_balance['free']}$ "
+                f"| Margin: {self.margin_balance['margin']}$ "
+                f"| Total: {self.total_balance}$")
             if self.position:
                 self.position.info()
                 Utils.printline(text='', title=False, line_char=":", size=60, blank=True)
@@ -157,24 +162,24 @@ class Wallet:
                 return {"Win_rate": round(accuracy, 3)}
             else:
                 return {
-                    "Total_wallet_value": round(self.total_balance(), 3),
-                    "Trades_counter": self.total_trades,
+                    "Total_wallet_value": round(self.total_balance, 3),
+                    "Trades_counter": self.closed_positions_dataframe.shape[0],
                     "Win_rate": round(accuracy, 3),
                     "Mean_profit": round(mean_profit_value, 3),
                     "Mean_loss": round(mean_loss_value, 3),
-                    "Combo_score": round(0.01 * accuracy * self.total_balance(), 4)
+                    "Combo_score": round(0.01 * accuracy * self.total_balance, 4)
                 }
         else:
             if only_win_rate:
                 return {f"{prefix} Win_rate": round(accuracy, 3)}
             else:
                 return {
-                    f"{prefix}_total_wallet_value": round(self.total_balance(), 3),
-                    f"{prefix}_trades_counter": self.total_trades,
+                    f"{prefix}_total_wallet_value": round(self.total_balance, 3),
+                    f"{prefix}_trades_counter": self.closed_positions_dataframe.shape[0],
                     f"{prefix}_win_rate": round(accuracy, 3),
                     f"{prefix}_mean_profit": round(mean_profit_value, 3),
                     f"{prefix}_mean_loss": round(mean_loss_value, 3),
-                    f"{prefix}_combo_score": round(0.01 * accuracy * self.total_balance(), 4)
+                    f"{prefix}_combo_score": round(0.01 * accuracy * self.total_balance, 4)
                 }
 
     def reset(self, ohlct: OHLCT):
@@ -204,8 +209,7 @@ class Wallet:
 
     def _prepare_to_open_position(self, cancel_position_type):
         if self.position is not None and self.position.type == cancel_position_type:
-            return self.position_close()
-        return TransactionReward()
+            self.position_close()
 
     def __update_dataframe(self, position: Position):
         self.closed_positions.append(position)
@@ -224,4 +228,6 @@ class Wallet:
                                                    "is_profit": position.is_stop_profit}
 
     def __repr__(self):
-        return f"<Wallet: ticker={self.ticker}, initial_balance={self.initial_balance}, margin_balance={self.margin_balance}>"
+        return f"<Wallet: ticker={self.ticker}, " \
+               f"initial_balance={self.initial_balance}, " \
+               f"margin_balance={self.margin_balance}>"

@@ -57,3 +57,6 @@ class DataProcessor:
     def info(self):
         print(f'{self.ticker} - Start: {self.dataframe.iloc[0].name} - End: {self.dataframe.iloc[-1].name}')
         print(f'Total steps: {self.total_steps} - Intervals: {self.intervals}')
+
+    def get_state(self, current_step):
+        pass

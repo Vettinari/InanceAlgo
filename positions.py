@@ -152,7 +152,7 @@ class Position:
 
     @property
     def state(self):
-        return [self.profit, self.stop_loss, self.stop_profit]
+        return [self.stop_loss, self.stop_profit, self.unrealized_profit]
 
     def __repr__(self):
         return f"<{self.type.capitalize()} Position: open_price={self.open_price}, " \
