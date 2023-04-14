@@ -10,7 +10,7 @@ from risk_manager import RiskManager
 
 
 class TradeGym(gym.Env, ABC):
-    def __init__(self, risk_manager: RiskManager, reward_scaling: float):
+    def __init__(self, risk_manager: RiskManager, data_processor: DataProcessor, reward_scaling: float):
         self.done = False
         self.current_step = 0
         self.current_ohlct: OHLCT = None
@@ -24,7 +24,7 @@ class TradeGym(gym.Env, ABC):
 
         # Objects
         self.risk_manager: RiskManager = risk_manager
-        self.data_processor: DataProcessor = None
+        self.data_processor: DataProcessor = data_processor
 
         # TODO
         self.continuous = False
@@ -48,7 +48,7 @@ class TradeGym(gym.Env, ABC):
             # Generate state from wallet and data in environment
             self.generate_state()
             # Calculate transition reward
-            end_reward = sum(self.risk_manager.yield_rewards(False))
+            end_reward = sum(self.risk_manager.yield_rewards())
             self.reward = (end_reward - start_reward) * self.reward_scaling
 
             return self.state, self.reward, self.done, {}

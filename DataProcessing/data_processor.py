@@ -1,10 +1,10 @@
 import enum
-from datetime import timedelta
-from typing import Optional
-
 import pandas as pd
-
+from typing import Optional
 from DataProcessing import ta
+import plotly.graph_objects as go
+
+from datetime import timedelta
 
 
 class OHLCT:
@@ -21,29 +21,13 @@ class OHLCT:
 
 class DataProcessor:
     def __init__(self,
-                 ticker: str,
-                 intervals: Optional[list] = None,
+                 dataframe: pd.DataFrame,
+                 interval: int,
                  technical_indicators: Optional[list] = None):
-        self.ticker = ticker
-        self.intervals = [15, 60, 120] if intervals is None else intervals
-        self.dataframe: pd.DataFrame = None
+        self.interval = interval
+        self.dataframe: pd.DataFrame = dataframe
         self.technical_dataframe: pd.DataFrame = None
         self.current_step = 0
-        self.total_steps = -999
-        self.load_data()
-        self.clean_data()
-
-    def load_data(self, path: Optional[str] = None):
-        path = f'Datasets/forex/intraday/{self.ticker}.csv' if path is None else path
-        self.dataframe = pd.read_csv(path, parse_dates=['Datetime'], index_col='Datetime')
-        self.dataframe = self.dataframe.groupby(
-            pd.Grouper(freq=f'{min(self.intervals)}T')).agg({'open': 'first',
-                                                             'close': 'last',
-                                                             'low': 'min',
-                                                             'high': 'max',
-                                                             'volume': 'sum'})
-        self.intervals.pop(0)
-        self.total_steps = self.dataframe.shape[0]
 
     def clean_data(self):
         pass
@@ -55,8 +39,39 @@ class DataProcessor:
         return OHLCT(dataframe_row=self.dataframe.iloc[current_step])
 
     def info(self):
-        print(f'{self.ticker} - Start: {self.dataframe.iloc[0].name} - End: {self.dataframe.iloc[-1].name}')
-        print(f'Total steps: {self.total_steps} - Intervals: {self.intervals}')
+        print(f'Start: {self.dataframe.iloc[0].name} - End: {self.dataframe.iloc[-1].name}')
+        print(f'Total steps: {self.total_steps} - Interval: {self.interval}')
 
     def get_state(self, current_step):
         pass
+
+    def __call__(self, interval: int, technical_indicators: list):
+        self.__init__(interval=interval, technical_indicators=technical_indicators)
+
+
+class ChartProcessor(DataProcessor):
+    def __init__(self, dataframe: pd.DataFrame, interval: int, ):
+        super().__init__(dataframe=dataframe, interval=interval)
+
+    def render(self, save: bool = True, inspection: bool = False):
+
+        fig = go.Figure(
+            data=[
+                go.Candlestick(
+                    x=self.dataframe["date"],
+                    open=self.dataframe["open"],
+                    high=self.dataframe["high"],
+                    low=self.dataframe["low"],
+                    close=self.dataframe["close"],
+                    increasing_line_color="green",
+                    decreasing_line_color="red",
+                )
+            ]
+        )
+
+        if save is False:
+            fig.show()
+        else:
+            fig.write_image()
+
+

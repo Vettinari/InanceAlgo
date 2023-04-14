@@ -377,7 +377,7 @@ class AbstractProcessor:
             return False
 
     def apply_nan_to_closed_market(self):
-        self.base_dataframe[self.base_dataframe['forex_open'] == False] = np.NaN
+
 
     def __create_time_df(self):
         df = self.time_dataframe

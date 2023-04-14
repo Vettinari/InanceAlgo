@@ -9,30 +9,19 @@ class Wallet:
     def __init__(self,
                  ticker,
                  initial_balance):
-
-        self.closed_positions = []
-
-        # Market specific values
         self.ticker = ticker.upper()
         self.initial_balance = initial_balance
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
-
-        self.position: Position = None
-        self.current_ohlct: OHLCT = None
-        self.closed_positions_dataframe = pd.DataFrame({"open_time": [],
-                                                        "close_time": [],
-                                                        "volume": [],
-                                                        "open_price": [],
-                                                        "close_price": [],
-                                                        "stop_loss": [],
-                                                        "stop_profit": [],
-                                                        "contract_value": [],
-                                                        "profit": [],
-                                                        "margin": [],
-                                                        "is_closed": [],
-                                                        "is_stop_loss": [],
-                                                        "is_profit": []}, index=[])
+        self.position = None
+        self.current_ohlct = None
         self.game_over = False
+        self.transaction_reward = None
+        self.intermediate_reward = None
+        self.closed_positions = []
+        self.closed_positions_dataframe = pd.DataFrame(columns=["open_time", "close_time", "volume", "open_price",
+                                                                "close_price", "stop_loss", "stop_profit",
+                                                                "contract_value", "profit", "margin", "is_closed",
+                                                                "is_stop_loss", "is_profit"])
         self.transaction_reward: TransactionReward = None
         self.intermediate_reward: IntermediateReward = None
 
@@ -81,7 +70,6 @@ class Wallet:
         self.intermediate_reward = IntermediateReward(position=self.position)
 
     def update_wallet(self, ohlct: OHLCT):
-        # Update ohlct
         self.current_ohlct = ohlct
         self.update_position()
         self.check_and_close_position()
@@ -213,19 +201,8 @@ class Wallet:
 
     def __update_dataframe(self, position: Position):
         self.closed_positions.append(position)
-        self.closed_positions_dataframe.loc[-1] = {"open_time": position.open_time,
-                                                   "close_time": position.close_time,
-                                                   "volume": position.volume,
-                                                   "open_price": position.open_price,
-                                                   "close_price": position.close_price,
-                                                   "stop_loss": position.stop_loss,
-                                                   "stop_profit": position.stop_profit,
-                                                   "contract_value": position.contract_value,
-                                                   "profit": position.profit,
-                                                   "margin": position.margin,
-                                                   "is_closed": position.is_closed,
-                                                   "is_stop_loss": position.is_stop_loss,
-                                                   "is_profit": position.is_stop_profit}
+        position_data = {col: getattr(position, col) for col in self.closed_positions_dataframe.columns}
+        self.closed_positions_dataframe = self.closed_positions_dataframe.append(position_data, ignore_index=True)
 
     def __repr__(self):
         return f"<Wallet: ticker={self.ticker}, " \
