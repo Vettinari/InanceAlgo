@@ -1,9 +1,11 @@
+import datetime
 from datetime import timedelta
 from typing import Dict
 
 import numpy as np
 from tqdm import tqdm
 
+import Utils
 from DataProcessing.data_processor import DataProcessor, OHLCT, ChartProcessor
 import pandas as pd
 
@@ -68,10 +70,13 @@ class DataPipeline:
         self.current_step += 1
         self.current_date = self.dataframe.index[self.current_step]
 
-    def _render_all_charts(self):
+    def render_all_charts(self):
         assert self.processor_type == ChartProcessor, 'use ChartProcessor as processor type to enable renders'
-        for _ in tqdm(range(0, self.dataframe.shape[0] - self.current_step)):
+        time = datetime.datetime.now()
+        for _ in tqdm(range(0, 1000)):
             self.get_current_data(save=True)
+
+        print(f'Rendering took {datetime.datetime.now() - time}')
 
     def get_ohlct(self, current_step) -> OHLCT:
         return OHLCT(dataframe_row=self.dataframe.iloc[current_step])

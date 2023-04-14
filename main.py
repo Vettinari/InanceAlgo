@@ -17,7 +17,8 @@ if __name__ == '__main__':
                                  intervals=[15, 60, 240],
                                  window=60,
                                  processor_type=ChartProcessor)
-    data_pipeline.get_current_data()
+    data_pipeline.render_all_charts()
+    # Rendering took 0:02:09.620930 seconds
 
     # print("-------------------------------------------")
     # print(data_pipeline)
