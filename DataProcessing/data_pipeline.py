@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
 from tqdm import tqdm
@@ -32,10 +32,48 @@ class DataPipeline:
         self.current_step = int(max(self.intervals) / self.step_size * self.window)
         self.current_date = self.dataframe.index[self.current_step]
 
+    def get_current_data(self, save: Optional[bool]):
+        processor_data = dict(zip(self.intervals, [0 for _ in range(len(self.intervals))]))
+
+        data_window = self.dataframe.loc[:self.current_date].iloc[:-1]
+        for processor_interval, processor in self.processors.items():
+            if processor.processor_type == 'chart':
+                processor_data[processor_interval] = processor.process(data=data_window,
+                                                                       current_step=self.current_step,
+                                                                       save=save)
+            else:
+                processor_data[processor_interval] = processor.process(data=data_window,
+                                                                       current_step=None,
+                                                                       save=False)
+        self.current_step += 1
+        self.current_date = self.dataframe.index[self.current_step]
+        return processor_data
+
+    def render_all_charts(self, limit=None):
+        assert self.processor_type == ChartProcessor, 'use ChartProcessor as processor type to enable renders'
+        time = datetime.datetime.now()
+        limit = limit or (self.dataframe.shape[0] - self.current_step)
+        for _ in tqdm(range(0, limit)):
+            self.get_current_data(save=True)
+
+        print(f'Rendering took {datetime.datetime.now() - time}')
+
+    def get_ohlct(self, current_step) -> OHLCT:
+        return OHLCT(dataframe_row=self.dataframe.iloc[current_step])
+
+    def reset(self):
+        self.current_step = self.window
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: ' \
+               f'current_step={self.current_step} | ' \
+               f'current_date={self.current_date} | ' \
+               f'intervals: {self.intervals}>'
+
     def _load_data(self):
         self.step_size = min(self.intervals)
-        path = f'Datasets/forex/intraday/{self.ticker}.csv'
-        # path = f'EURUSD_short.csv'
+        # path = f'Datasets/forex/intraday/{self.ticker}.csv'
+        path = f'EURUSD_short.csv'
         df = pd.read_csv(path, parse_dates=['Datetime'], index_col='Datetime')
         df = df.groupby(pd.Grouper(freq=f'{self.step_size}T')).agg({'open': 'first',
                                                                     'close': 'last',
@@ -58,37 +96,6 @@ class DataPipeline:
     def _build_processors(self):
         for interval in self.intervals:
             self.processors[interval] = self.processor_type(interval=interval, window=self.window)
-
-    def get_current_data(self, save=True):
-        data_window = self.dataframe.loc[:self.current_date].iloc[:-1]
-        for processor_interval, processor in self.processors.items():
-            if processor.processor_type == 'chart':
-                processor.process(data=data_window, current_step=self.current_step, save=save)
-            else:
-                processor.process(data=data_window, current_step=None)
-
-        self.current_step += 1
-        self.current_date = self.dataframe.index[self.current_step]
-
-    def render_all_charts(self):
-        assert self.processor_type == ChartProcessor, 'use ChartProcessor as processor type to enable renders'
-        time = datetime.datetime.now()
-        for _ in tqdm(range(0, 1000)):
-            self.get_current_data(save=True)
-
-        print(f'Rendering took {datetime.datetime.now() - time}')
-
-    def get_ohlct(self, current_step) -> OHLCT:
-        return OHLCT(dataframe_row=self.dataframe.iloc[current_step])
-
-    def reset(self):
-        self.current_step = self.window
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: ' \
-               f'current_step={self.current_step} | ' \
-               f'current_date={self.current_date} | ' \
-               f'intervals: {self.intervals}>'
 
     @staticmethod
     def _is_forex_day(row):
