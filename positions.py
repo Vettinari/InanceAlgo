@@ -2,7 +2,7 @@ import operator
 from typing import Callable
 
 import Utils
-from DataProcessing.data_processor import OHLCT
+from DataProcessing.timeframe import OHLCT
 
 XTB = {"EURUSD": {"one_lot_value": 100000,
                   "leverage": 30,
@@ -92,7 +92,6 @@ class Position:
         self.is_stop_profit = False
         self.is_stop_loss = False
         # Type specific
-        self.position_risk = 0
         self.stop_loss = 0
         self.volume = 0
         self.stop_profit = 0

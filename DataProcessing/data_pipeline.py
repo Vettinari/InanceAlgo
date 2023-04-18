@@ -1,76 +1,50 @@
-import datetime
-from datetime import timedelta
-from typing import Dict, Optional
-
 import numpy as np
-from tqdm import tqdm
-
-import Utils
-from DataProcessing.data_processor import DataProcessor, OHLCT, ChartProcessor
 import pandas as pd
+from datetime import timedelta
+from typing import Dict, Union, List, Optional
+
+from DataProcessing.timeframe import TimeFrame, OHLCT
 
 
 class DataPipeline:
-    def __init__(self, ticker: str, intervals: list, window: int,
-                 processor_type: DataProcessor = DataProcessor):
+    def __init__(self, ticker: str, intervals: list, data_window: int, chart_window: int):
         self.ticker: str = ticker
+        self.step_size: int = min(intervals)
         self.intervals: list = sorted(intervals)
-        self.dataframe: pd.DataFrame = None
-        self.step_size: int = None
-        self.processors: Dict[int, DataProcessor] = {}
-        self.window = window
-        self.processor_type: DataProcessor = processor_type
+        self.timeframes: Dict[int, TimeFrame] = {interval: TimeFrame(interval=interval,
+                                                                     data_window=data_window,
+                                                                     chart_window=chart_window)
+                                                 for interval in intervals}
         self.current_step = None
         self.current_date = None
+        self.dataframe: pd.DataFrame = None
+        self.window = max(self.get_window_size(), chart_window)
         # Init data pipeline
-        self._load_data()
-        self._clean_data()
+        self._load_csv_data()
+        self._clean_dataframe()
         self.reset_step()
-        self._build_processors()
+
+    def process_data(self):
+        window_data = self.dataframe.loc[:self.current_date].iloc[:-1]
+        for interval, timeframe in self.timeframes.items():
+            timeframe.process_window_data(window_data=window_data)
+
+    def current_data(self, interval: Optional[int] = None) -> Union[TimeFrame, Dict[int, TimeFrame]]:
+        if interval is not None:
+            return self.timeframes[interval]
+        return self.timeframes
 
     def reset_step(self):
         self.current_step = int(max(self.intervals) / self.step_size * self.window)
         self.current_date = self.dataframe.index[self.current_step]
+        self.process_data()
 
-    def get_current_data(self, save: Optional[bool]):
-        processor_data = dict(zip(self.intervals, [0 for _ in range(len(self.intervals))]))
-
-        data_window = self.dataframe.loc[:self.current_date].iloc[:-1]
-        for processor_interval, processor in self.processors.items():
-            if processor.processor_type == 'chart':
-                processor_data[processor_interval] = processor.process(data=data_window,
-                                                                       current_step=self.current_step,
-                                                                       save=save)
-            else:
-                processor_data[processor_interval] = processor.process(data=data_window,
-                                                                       current_step=None,
-                                                                       save=False)
+    def step_forward(self):
         self.current_step += 1
         self.current_date = self.dataframe.index[self.current_step]
-        return processor_data
+        self.process_data()
 
-    def render_all_charts(self, limit=None):
-        assert self.processor_type == ChartProcessor, 'use ChartProcessor as processor type to enable renders'
-        time = datetime.datetime.now()
-        limit = limit or (self.dataframe.shape[0] - self.current_step)
-        for _ in tqdm(range(0, limit)):
-            self.get_current_data(save=True)
-
-        print(f'Rendering took {datetime.datetime.now() - time}')
-
-    def get_ohlct(self, current_step) -> OHLCT:
-        return OHLCT(dataframe_row=self.dataframe.iloc[current_step])
-
-    def reset(self):
-        self.current_step = self.window
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: ' \
-               f'current_step={self.current_step} | ' \
-               f'current_date={self.current_date} | ' \
-               f'intervals: {self.intervals}>'
-
-    def _load_data(self):
+    def _load_csv_data(self):
         self.step_size = min(self.intervals)
         # path = f'Datasets/forex/intraday/{self.ticker}.csv'
         path = f'EURUSD_short.csv'
@@ -82,7 +56,7 @@ class DataPipeline:
                                                                     'volume': 'sum'})
         self.dataframe = df
 
-    def _clean_data(self):
+    def _clean_dataframe(self):
         # Adjust to Amsterdam time
         self.dataframe.index = self.dataframe.index + timedelta(hours=1, minutes=0)
         # Filter out only forex days
@@ -93,27 +67,35 @@ class DataPipeline:
         self.dataframe.dropna(axis=0, inplace=True)
         self.dataframe.drop(columns=['forex_open'], axis=0, inplace=True)
 
-    def _build_processors(self):
-        for interval in self.intervals:
-            self.processors[interval] = self.processor_type(interval=interval, window=self.window)
-
     @staticmethod
     def _is_forex_day(row):
         start_time = 23
         end_time = 22
-
-        # MARK WORKING DAYS
-        if row.name.dayofweek == 0:
-            return True
-        elif row.name.dayofweek == 1:
-            return True
-        elif row.name.dayofweek == 2:
-            return True
-        elif row.name.dayofweek == 3:
-            return True
-        elif row.name.dayofweek == 4 and row.name.time().hour < end_time:
-            return True
-        elif row.name.dayofweek == 6 and row.name.time().hour >= start_time:
+        valid_weekdays = [0, 1, 2, 3, 4, 6]  # Monday to Friday and Sunday
+        if row.name.dayofweek in valid_weekdays:
+            if row.name.dayofweek == 4 and row.name.time().hour >= end_time:
+                return False  # Friday after end_time is not a valid day
+            if row.name.dayofweek == 6 and row.name.time().hour < start_time:
+                return False  # Sunday before start_time is not a valid day
             return True
         else:
             return False
+
+    @property
+    def ohlct(self) -> OHLCT:
+        return self.timeframes[self.step_size].get_ohlct()
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: ' \
+               f'window={self.window} | ' \
+               f'current_step={self.current_step} | ' \
+               f'current_date={self.current_date} | ' \
+               f'intervals: {self.intervals}>'
+
+    def get_window_size(self):
+        max_window_size = 0
+        max_timeframe = max(list(self.timeframes.keys()))
+        for indicator_vals in self.timeframes[max_timeframe].tech_processor.ema_args.values():
+            if indicator_vals['length'] > max_window_size:
+                max_window_size = indicator_vals['length']
+        return max_window_size

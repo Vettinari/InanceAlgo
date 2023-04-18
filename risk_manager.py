@@ -1,5 +1,6 @@
 from pprint import pprint
-from DataProcessing.data_processor import OHLCT
+
+from DataProcessing.timeframe import OHLCT
 from reward_system import ActionReward, TransactionReward, IntermediateReward
 from wallet import Wallet
 from typing import List, Optional, Union
@@ -99,9 +100,6 @@ class RiskManager:
     @property
     def current_rewards(self):
         return sum([reward.reward for reward in self.yield_rewards()])
-
-    def wallet_reset(self, ohlct):
-        self.wallet.reset(ohlct)
 
     def wallet_step(self, ohlct: OHLCT):
         self.wallet.update_wallet(ohlct=ohlct)
