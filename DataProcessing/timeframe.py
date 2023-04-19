@@ -23,11 +23,11 @@ class TimeFrame:
     def __init__(self,
                  interval: int,
                  chart_window: int,
-                 data_window: int = 1,
+                 return_window: int = 1,
                  data_types: Optional[list] = None):
         self.interval = interval
-        self.data_processor = DataProcessor(interval=interval, window=data_window)
-        self.tech_processor = TechProcessor(interval=interval, window=data_window)
+        self.data_processor = DataProcessor(interval=interval, window=return_window)
+        self.tech_processor = TechProcessor(interval=interval, window=return_window)
         self.candlestick_processor = CandlestickProcessor(interval=interval, window=chart_window)
         self.volume_profile_processor = VolumeProfile(interval=interval, window=chart_window)
         self.data_types = ['data', 'tech'] or data_types
@@ -62,3 +62,9 @@ class TimeFrame:
                f"{self.data()}\n" \
                f"{self.interval}T tech:\n" \
                f"{self.tech()}"
+
+    @property
+    def state_size(self):
+        data_state = self.data().shape[0] * self.data().shape[1]
+        tech_state = self.tech().shape[0] * self.tech().shape[1]
+        return data_state + tech_state

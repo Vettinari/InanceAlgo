@@ -7,18 +7,20 @@ from DataProcessing.timeframe import TimeFrame, OHLCT
 
 
 class DataPipeline:
-    def __init__(self, ticker: str, intervals: list, data_window: int, chart_window: int):
+    def __init__(self, ticker: str, intervals: list, return_window: int, chart_window: int):
         self.ticker: str = ticker
         self.step_size: int = min(intervals)
         self.intervals: list = sorted(intervals)
+        self.return_window = return_window
         self.timeframes: Dict[int, TimeFrame] = {interval: TimeFrame(interval=interval,
-                                                                     data_window=data_window,
+                                                                     return_window=return_window,
                                                                      chart_window=chart_window)
                                                  for interval in intervals}
         self.current_step = None
         self.current_date = None
         self.dataframe: pd.DataFrame = None
         self.window = max(self.get_window_size(), chart_window)
+        self.data_window = 1
         # Init data pipeline
         self._load_csv_data()
         self._clean_dataframe()
@@ -99,3 +101,7 @@ class DataPipeline:
             if indicator_vals['length'] > max_window_size:
                 max_window_size = indicator_vals['length']
         return max_window_size
+
+    def state_size(self):
+        timeframes_count = len(self.timeframes.keys())
+        return timeframes_count * self.timeframes[self.step_size].state_size

@@ -27,6 +27,10 @@ class DataProcessor:
     def data(self):
         return self._data.iloc[-self.window:]
 
+    @property
+    def state_size(self):
+        return self._data.shape[0]
+
 
 class TechProcessor(DataProcessor):
     def __init__(self, interval: int, window: int):
