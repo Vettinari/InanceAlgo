@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from DataProcessing.timeframe import OHLCT
-from reward_system import ActionReward, TransactionReward, IntermediateReward
+from reward_system import ActionReward, TransactionReward, IntermediateReward, RewardBuffer
 from wallet import Wallet
 from typing import List, Optional, Union
 
@@ -21,30 +21,26 @@ class RiskManager:
             self,
             ticker: str,
             initial_balance: float,
+            reward_buffer: RewardBuffer,
             atr_stop_loss_ratios: Optional[List[float]] = None,
             risk_reward_ratios: Optional[List[int]] = None,
             manual_position_closing: bool = True,
             portfolio_risk: Optional[float] = None,
             stop_loss_type: str = 'atr',
-            wallet: Optional[Wallet] = None
+            wallet: Optional[Wallet] = None,
+
     ):
         self.initial_balance = initial_balance
         self.atr_stop_loss_ratios = atr_stop_loss_ratios or [2, 3]
         self.risk_reward_ratios = risk_reward_ratios or [1, 2, 3]
         self.trade_risk = initial_balance * (portfolio_risk or 0.02)
         self.manual_position_closing = manual_position_closing
-        self.wallet = wallet or Wallet(ticker=ticker, initial_balance=initial_balance)
+        self.wallet = wallet or Wallet(ticker=ticker,
+                                       initial_balance=initial_balance,
+                                       reward_buffer=reward_buffer)
         self.action_dict = self._generate_action_space()
         self.stop_loss_type = stop_loss_type
-        self.action_reward: ActionReward = None
-        self.transaction_reward: TransactionReward = None
-        self.intermediate_reward: IntermediateReward = None
-        self._initialize_rewards()
-
-    def _initialize_rewards(self):
-        self.action_reward = ActionReward(reward=0)
-        self.transaction_reward = TransactionReward()
-        self.intermediate_reward = IntermediateReward(position=None, scaling_factor=None)
+        self.reward_buffer: RewardBuffer = reward_buffer
 
     def _generate_action_space(self) -> dict:
         actions = ['long', 'short', 'hold']
@@ -68,9 +64,13 @@ class RiskManager:
     def _validate_action(self, action: str) -> bool:
         position = self.wallet.position
         if position and position.type == action or (not position and action == 'close'):
-            self.action_reward = ActionReward(reward=-1)
+            self.reward_buffer.reward_action(reward=-1)
             return False
-        self.action_reward = ActionReward(reward=0.1)
+
+        if action == 'hold' and self.wallet.position is None:
+            self.reward_buffer.reward_action(reward=-0.01)
+        else:
+            self.action_reward = ActionReward(reward=1)
         return True
 
     def execute_action(self, action_index: int, current_atr: float):
@@ -91,8 +91,7 @@ class RiskManager:
         self._update_rewards()
 
     def _update_rewards(self):
-        self.transaction_reward = self.wallet.transaction_reward
-        self.intermediate_reward = self.wallet.intermediate_reward
+        self.transaction_reward, self.intermediate_reward = self.wallet.reap_rewards()
 
     def yield_rewards(self) -> List[Union[ActionReward, TransactionReward, IntermediateReward]]:
         return [self.action_reward, self.transaction_reward, self.intermediate_reward]

@@ -48,8 +48,8 @@ class DataPipeline:
 
     def _load_csv_data(self):
         self.step_size = min(self.intervals)
-        # path = f'Datasets/forex/intraday/{self.ticker}.csv'
-        path = f'EURUSD_short.csv'
+        path = f'/Users/milosz/Documents/Pycharm/InanceAlgo/Datasets/forex/intraday/{self.ticker}.csv'
+        # path = '/Users/milosz/Documents/Pycharm/InanceAlgo/EURUSD_short.csv'
         df = pd.read_csv(path, parse_dates=['Datetime'], index_col='Datetime')
         df = df.groupby(pd.Grouper(freq=f'{self.step_size}T')).agg({'open': 'first',
                                                                     'close': 'last',

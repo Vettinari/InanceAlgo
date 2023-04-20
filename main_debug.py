@@ -42,4 +42,8 @@ env = TradeGym(data_pipeline=data_pipeline,
                reward_scaling=0.99)
 
 if __name__ == '__main__':
-    pass
+    done = False
+    while ~done:
+        action = int(input("Choose action:"))
+        env.step(action=action)
+        print(env.risk_manager.reward_buffer)

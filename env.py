@@ -29,6 +29,7 @@ class TradeGym(gymnasium.Env):
         # Rewards
         self.reward_scaling = reward_scaling
         self.reward = 0
+        self.rewards = []
 
         # Objects
         self.risk_manager: RiskManager = risk_manager
@@ -47,7 +48,7 @@ class TradeGym(gymnasium.Env):
         self.done = self.current_step >= (self.max_steps - 1) or self.risk_manager.wallet.game_over  # OK
 
         if self.done:
-            return self.state, self.reward, self.done, {}
+            return self.state, self.reward, False, self.done, {}
 
         else:
             # if self.current_step % 1000 == 0:
@@ -57,16 +58,24 @@ class TradeGym(gymnasium.Env):
             # state: S -> S+1
             self.current_step += 1
             self.data_pipeline.step_forward()
+
             # Update wallet and environment elements for state generation
             self.update_wallet_and_env()
+
             # Calculate transition reward
             end_reward = self.risk_manager.current_rewards
             self.reward = (end_reward - start_reward) * self.reward_scaling
 
-            # print(f"Env_reward: {self.reward}\n"
-            #       f"{self.risk_manager.wallet}")
+            self.rewards.append(self.reward)
 
-            return self.state, self.reward, self.done, {}
+            if self.current_step % 100 == 0:
+                print(f"{self.current_step}/{self.max_steps} | "
+                      f"Total_rewards: {round(sum(self.rewards), 3)} | "
+                      f"Mean_100: {round(np.array(self.rewards)[-100:].mean(), 3)} | "
+                      f"Mean_1000: {round(np.array(self.rewards)[-1000:].mean(), 3)} | "
+                      f"Wallet balance: {self.risk_manager.wallet.total_balance}$")
+
+            return self.state, self.reward, self.done, False, {}
 
     def get_atr(self, interval=15):
         return float(self.timeframes[interval].tech()['atrr_14'])
@@ -103,11 +112,11 @@ class TradeGym(gymnasium.Env):
             data.append(timeframe.data().values)
             tech.append(timeframe.tech().values)
 
-        self.data_state = data
-        self.tech_state = tech
+        self.data_state = np.hstack(data).flatten()
+        self.tech_state = np.hstack(tech).flatten()
 
     def generate_state(self):
-        self.state = [*self.wallet_state, *self.data_state, *self.tech_state]
+        self.state = np.hstack([self.wallet_state, self.data_state, self.tech_state])
 
     def __repr__(self):
         return f'<TradeGym:\n' \
