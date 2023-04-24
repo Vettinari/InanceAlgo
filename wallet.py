@@ -1,9 +1,10 @@
+from pprint import pprint
+
 import Utils
 import pandas as pd
-
 from DataProcessing.timeframe import OHLCT
 from positions import Position, Long, Short
-from reward_system import TransactionReward, IntermediateReward, RewardBuffer
+from reward_system import RewardBuffer
 
 template_position = Long(ticker='EURUSD',
                          open_time='0',
@@ -11,6 +12,9 @@ template_position = Long(ticker='EURUSD',
                          stop_loss=0.99,
                          risk_reward_ratio=1.5,
                          position_risk=100)
+
+dataframe_columns = list(template_position.__dict__.keys())
+dataframe_columns = [column for column in dataframe_columns if not column.endswith("_history")]
 
 
 class Wallet:
@@ -27,6 +31,7 @@ class Wallet:
         self.transaction_reward = None
         self.intermediate_reward = None
         self.closed_positions = []
+        self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
         self.reward_buffer: RewardBuffer = reward_buffer
         self.total_trades = 0
 
@@ -70,8 +75,13 @@ class Wallet:
         self.margin_balance['free'] += self.position.profit
         self.free_margin()
         self.__update_dataframe(position=self.position)
-        self.reward_buffer.reward_transaction(position=self.position)
+        self.generate_rewards()
         self.position = None
+
+    def generate_rewards(self):
+        self.reward_buffer.reward_transaction(position=self.position)
+        self.reward_buffer.reward_sharpe(returns=self.returns)
+        self.reward_buffer.reward_drawdown(returns=self.returns)
 
     def update_wallet(self, ohlct: OHLCT):
         self.is_game_over()
@@ -84,23 +94,29 @@ class Wallet:
             self.position.update_position(ohlct=self.current_ohlct)
             self.reward_buffer.reward_intermediate(position=self.position)
 
+    @property
+    def returns(self):
+        return self.history_dataframe.profit.values
+
     def check_and_close_position(self):
         if self.position is not None and self.position.is_closed:
             self.margin_balance['free'] += self.position.profit
             self.free_margin()
             self.__update_dataframe(position=self.position)
-            self.reward_buffer.reward_transaction(position=self.position)
+            self.generate_rewards()
             self.position = None
 
     @property
-    def state(self):
+    def state(self, include_balance=True):
         balance = self.total_balance / (self.initial_balance * 10)
         position_type = [0, 0] if self.position is None else [int(self.position.type == 'long'),
                                                               int(self.position.type == 'short')]
         position_state = self.position.state if self.position is not None else [0, 0, 0]
-        # print(f'Wallet: balance={balance} | position_type={position_type} | position_state={position_state}')
 
-        return [balance, *position_type, *position_state]
+        if include_balance:
+            return [balance, *position_type, *position_state]
+        else:
+            return [*position_type, *position_state]
 
     @property
     def cash(self) -> float:
@@ -136,10 +152,10 @@ class Wallet:
         self.position = None
         self.game_over = False
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
-        self.transaction_reward: TransactionReward = TransactionReward()
-        self.intermediate_reward: IntermediateReward = IntermediateReward(position=self.position, scaling_factor=0)
         self.update_wallet(ohlct=ohlct)
         self.total_trades = 0
+        self.closed_positions = []
+        self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
 
     def cancel_position(self):
         self.margin_balance['free'] += self.position.margin
@@ -150,6 +166,20 @@ class Wallet:
             self.position_close()
 
     def __update_dataframe(self, position: Position):
+        string_args = ['open_time', 'close_time', 'type', 'ticker', 'order_number']
+
+        position_dict = {argument: float(position.__dict__[argument]) for argument in dataframe_columns if
+                         argument not in string_args}
+
+        position_dict['open_time'] = position.open_time
+        position_dict['close_time'] = position.close_time
+        position_dict['type'] = position.type
+        position_dict['ticker'] = position.ticker
+        position_dict['order_number'] = position.order_number
+
+        self.history_dataframe = pd.concat([self.history_dataframe,
+                                            pd.DataFrame(position_dict, index=[0])],
+                                           axis=0, ignore_index=True)
         self.closed_positions.append(position)
         self.total_trades += 1
 
@@ -159,12 +189,3 @@ class Wallet:
     def is_game_over(self):
         if self.total_balance < self.initial_balance / 10:
             self.game_over = True
-
-    def reset_rewards(self):
-        self.transaction_reward = None
-        self.intermediate_reward = None
-
-    def reap_rewards(self):
-        out = [self.transaction_reward, self.intermediate_reward]
-        self.reset_rewards()
-        return out

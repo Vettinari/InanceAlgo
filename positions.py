@@ -93,14 +93,18 @@ class Position:
         self.is_stop_loss = False
         # Type specific
         self.stop_loss = 0
-        self.volume = 0
         self.stop_profit = 0
+        self.volume = 0
         self.margin = 0
         self.contract_value = 0
         self.risk_reward_ratio = 0
         # Broker specific
         self.order_number = None
         self.type = "Abstract"
+        # TrendReward calculations
+        self.profit_history = []
+        self.market_history = []
+        self.steps_count = 0
 
     def update_position(self, ohlct: OHLCT) -> None:
         pass
@@ -167,8 +171,8 @@ class Long(Position):
 
         # Calculated
         self.risk_reward_ratio = risk_reward_ratio
-        self.stop_profit = round(open_price + risk_reward_ratio * (open_price - stop_loss), 5)
         self.position_gain = self.position_risk * risk_reward_ratio
+        self.stop_profit = round(open_price + risk_reward_ratio * (open_price - stop_loss), 5)
 
         self.volume = round(
             (position_risk / abs(open_price - stop_loss)) * open_price / XTB[self.ticker]['one_lot_value'], 2)
@@ -178,6 +182,9 @@ class Long(Position):
         self.type = 'long'
 
     def update_position(self, ohlct: OHLCT) -> None:
+        self.market_history.append(ohlct.close)
+        self.steps_count += 1
+
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
             self.is_closed = True
@@ -194,6 +201,8 @@ class Long(Position):
                 self.profit = self.position_gain
             else:
                 self.update_profit(current_price=ohlct.close)
+
+        self.profit_history.append(self.profit)
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.le)
@@ -227,6 +236,9 @@ class Short(Position):
         self.type = 'short'
 
     def update_position(self, ohlct: OHLCT) -> None:
+        self.market_history.append(ohlct.close)
+        self.steps_count += 1
+
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
             self.is_closed = True
@@ -243,6 +255,8 @@ class Short(Position):
                 self.profit = self.position_gain
             else:
                 self.update_profit(current_price=ohlct.close)
+
+        self.profit_history.append(self.profit)
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.ge)

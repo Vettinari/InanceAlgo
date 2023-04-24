@@ -54,9 +54,10 @@ class CandlestickProcessor(Renderer):
         fig.add_trace(candlestick, row=1, col=1, )
         fig.update_traces({'increasing': {'fillcolor': 'green',
                                           'line': {'color': 'green',
-                                                   'width': 2}}, 'decreasing': {'fillcolor': 'red',
-                                                                                'line': {'color': 'red',
-                                                                                         'width': 2}}})
+                                                   'width': 2}},
+                           'decreasing': {'fillcolor': 'red',
+                                          'line': {'color': 'red',
+                                                   'width': 2}}})
 
         fig.add_trace(volume_bars, row=2, col=1)
         fig.add_hline(y=data.iloc[-1].close, line_width=1.5, line_color="Blue", row=1,

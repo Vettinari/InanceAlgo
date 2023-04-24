@@ -24,17 +24,15 @@ class RiskManager:
             reward_buffer: RewardBuffer,
             atr_stop_loss_ratios: Optional[List[float]] = None,
             risk_reward_ratios: Optional[List[int]] = None,
-            manual_position_closing: bool = True,
+            position_closing: bool = True,
             portfolio_risk: Optional[float] = None,
             stop_loss_type: str = 'atr',
-            wallet: Optional[Wallet] = None,
-
-    ):
+            wallet: Optional[Wallet] = None):
         self.initial_balance = initial_balance
         self.atr_stop_loss_ratios = atr_stop_loss_ratios or [2, 3]
         self.risk_reward_ratios = risk_reward_ratios or [1, 2, 3]
         self.trade_risk = initial_balance * (portfolio_risk or 0.02)
-        self.manual_position_closing = manual_position_closing
+        self.position_closing = position_closing
         self.wallet = wallet or Wallet(ticker=ticker,
                                        initial_balance=initial_balance,
                                        reward_buffer=reward_buffer)
@@ -42,7 +40,7 @@ class RiskManager:
         self.stop_loss_type = stop_loss_type
         self.reward_buffer: RewardBuffer = reward_buffer
 
-    def _generate_action_space(self) -> dict:
+    def _generate_action_space(self, ) -> dict:
         actions = ['long', 'short', 'hold']
         action_space = []
 
@@ -54,7 +52,7 @@ class RiskManager:
             else:
                 action_space.append(Action(action='hold', stop_loss=None, risk_reward=None))
 
-        if self.manual_position_closing:
+        if self.position_closing:
             action_space.append(Action(action='close', stop_loss=None, risk_reward=None))
 
         action_space = dict(zip(range(0, len(action_space)), action_space))
@@ -62,19 +60,24 @@ class RiskManager:
         return action_space
 
     def _validate_action(self, action: str) -> bool:
+        flag = True
         position = self.wallet.position
+
         if position and position.type == action or (not position and action == 'close'):
-            self.reward_buffer.reward_action(reward=-1)
-            return False
+            self.reward_buffer.reward_action(reward=-1.0)
+            flag = False
 
         if action == 'hold' and self.wallet.position is None:
-            self.reward_buffer.reward_action(reward=-0.01)
-        else:
-            self.action_reward = ActionReward(reward=1)
-        return True
+            self.reward_buffer.reward_action(reward=-0.05)
+            flag = False
+
+        if flag:
+            self.reward_buffer.reward_action(reward=0.01)
+        return flag
 
     def execute_action(self, action_index: int, current_atr: float):
         action = self.action_dict[action_index]
+
         if self._validate_action(action=action.action):
             if action.action == "close":
                 self.wallet.position_close()
@@ -88,17 +91,6 @@ class RiskManager:
                 self.wallet.open_short(stop_loss_delta=stop_loss_delta,
                                        risk_reward_ratio=action.risk_reward,
                                        position_risk=self.trade_risk)
-        self._update_rewards()
-
-    def _update_rewards(self):
-        self.transaction_reward, self.intermediate_reward = self.wallet.reap_rewards()
-
-    def yield_rewards(self) -> List[Union[ActionReward, TransactionReward, IntermediateReward]]:
-        return [self.action_reward, self.transaction_reward, self.intermediate_reward]
-
-    @property
-    def current_rewards(self):
-        return sum([reward.reward for reward in self.yield_rewards()])
 
     def wallet_step(self, ohlct: OHLCT):
         self.wallet.update_wallet(ohlct=ohlct)
@@ -111,9 +103,6 @@ class RiskManager:
         print('Trade risk:', self.trade_risk)
         print('Action space:', len(self._generate_action_space()))
         pprint(self._generate_action_space())
-
-    def rewards_info(self):
-        print('RiskManager Rewards:', [str(reward) for reward in self.yield_rewards()])
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: " \

@@ -41,7 +41,7 @@ def string_to_datetime(date_string, include_time=True):
 
 
 def concurrent_execution(function, args):
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         executor.map(function, args)
 
 

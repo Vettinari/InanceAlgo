@@ -7,7 +7,8 @@ from DataProcessing.timeframe import TimeFrame, OHLCT
 
 
 class DataPipeline:
-    def __init__(self, ticker: str, intervals: list, return_window: int, chart_window: int):
+    def __init__(self, ticker: str, intervals: list, return_window: int, chart_window: int,
+                 test: Optional[bool] = None):
         self.ticker: str = ticker
         self.step_size: int = min(intervals)
         self.intervals: list = sorted(intervals)
@@ -22,12 +23,13 @@ class DataPipeline:
         self.window = max(self.get_window_size(), chart_window)
         self.data_window = 1
         # Init data pipeline
+        self.test = False if test is None else test
         self._load_csv_data()
         self._clean_dataframe()
         self.reset_step()
 
     def process_data(self):
-        window_data = self.dataframe.loc[:self.current_date].iloc[:-1]
+        window_data = self.dataframe.loc[:self.current_date].iloc[-self.window - 1:-1]
         for interval, timeframe in self.timeframes.items():
             timeframe.process_window_data(window_data=window_data)
 
@@ -49,7 +51,8 @@ class DataPipeline:
     def _load_csv_data(self):
         self.step_size = min(self.intervals)
         path = f'/Users/milosz/Documents/Pycharm/InanceAlgo/Datasets/forex/intraday/{self.ticker}.csv'
-        # path = '/Users/milosz/Documents/Pycharm/InanceAlgo/EURUSD_short.csv'
+        if self.test:
+            path = '/Users/milosz/Documents/Pycharm/InanceAlgo/EURUSD_short.csv'
         df = pd.read_csv(path, parse_dates=['Datetime'], index_col='Datetime')
         df = df.groupby(pd.Grouper(freq=f'{self.step_size}T')).agg({'open': 'first',
                                                                     'close': 'last',
@@ -101,7 +104,3 @@ class DataPipeline:
             if indicator_vals['length'] > max_window_size:
                 max_window_size = indicator_vals['length']
         return max_window_size
-
-    def state_size(self):
-        timeframes_count = len(self.timeframes.keys())
-        return timeframes_count * self.timeframes[self.step_size].state_size

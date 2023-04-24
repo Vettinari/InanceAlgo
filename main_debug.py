@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import numpy as np
 import pandas as pd
 import torch
@@ -26,24 +28,34 @@ reward_buffer = RewardBuffer()
 
 risk_manager = RiskManager(ticker=ticker,
                            initial_balance=10000,
-                           atr_stop_loss_ratios=[1.5, 2],
-                           risk_reward_ratios=[1.5, 2, 3],
-                           manual_position_closing=True,
+                           atr_stop_loss_ratios=[2],
+                           risk_reward_ratios=[1.5],
+                           position_closing=True,
                            portfolio_risk=0.01,
                            reward_buffer=reward_buffer)
 
 data_pipeline = DataPipeline(ticker=ticker,
                              intervals=[15, 60, 240],
                              return_window=1,
-                             chart_window=100)
+                             chart_window=100,
+                             test=True)
 
 env = TradeGym(data_pipeline=data_pipeline,
                risk_manager=risk_manager,
                reward_scaling=0.99)
 
+seed = 42
+np.random.seed(seed=seed)
+torch.manual_seed(seed=seed)
+np.set_printoptions(suppress=True)
+
 if __name__ == '__main__':
+    print(risk_manager.info())
     done = False
-    while ~done:
+    while not done:
         action = int(input("Choose action:"))
+        if action == 9:
+            break
         env.step(action=action)
-        print(env.risk_manager.reward_buffer)
+
+    env.risk_manager.reward_buffer.info()

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from typing import Optional
 from DataProcessing.ta import TechnicalIndicator
+import pandas_ta
 
 
 class DataProcessor:
@@ -47,13 +48,19 @@ class TechProcessor(DataProcessor):
         out = [
             self.calculate_atr(data_window=data_window),
             *self.calculate_rsi(data_window=data_window),
-            *self.calculate_ema(data_window=data_window)
+            *self.calculate_ema(data_window=data_window),
+            *self.calculate_volume_ma(data_window=data_window),
         ]
         self._data = pd.concat(out, axis=1)
 
     def calculate_atr(self, data_window):
         tech = TechnicalIndicator(indicator='atr', params=self.atr_args)
         return np.round(tech.calculate(data=data_window), 5)
+
+    def calculate_volume_ma(self, data_window: pd.DataFrame):
+        tech = pandas_ta.ema(close=data_window.volume, length=2)
+        slope_tech = np.round(tech.rolling(self.slope).mean().diff(), 6)
+        return [tech, slope_tech]
 
     def calculate_rsi(self, data_window):
         tech = TechnicalIndicator(indicator='rsi', params=self.rsi_args)
