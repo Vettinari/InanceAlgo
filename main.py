@@ -17,7 +17,8 @@ from DataProcessing.data_pipeline import DataPipeline
 from env import TradeGym
 from experimental.data_buffering import DataBuffer
 from positions import Position, Long
-from reward_system import RewardBuffer, SharpeReward, ConsistencyReward, ProfitFactorReward, DrawdownReward, TrendReward
+from reward_system import RewardBuffer, SharpeReward, ConsistencyReward, ProfitFactorReward, DrawdownReward, \
+    TrendReward, MaxBalanceReward
 from risk_manager import RiskManager
 
 pd.set_option('display.max_rows', 500)
@@ -38,7 +39,5 @@ risk_manager = RiskManager(ticker=ticker,
                            reward_buffer=reward_buffer)
 
 if __name__ == '__main__':
-    print(risk_manager)
+    pass
 
-    # history_dataframe.append(position_entry)
-    # db.concurrent_data_process()  # 0:03:38.055377

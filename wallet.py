@@ -22,6 +22,7 @@ class Wallet:
                  ticker: str,
                  initial_balance: float,
                  reward_buffer: RewardBuffer):
+        self.max_balance = initial_balance
         self.ticker = ticker.upper()
         self.initial_balance = initial_balance
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
@@ -79,6 +80,8 @@ class Wallet:
         self.position = None
 
     def generate_rewards(self):
+        if self.total_balance > self.max_balance:
+            self.max_balance = self.total_balance
         self.reward_buffer.reward_transaction(position=self.position)
         self.reward_buffer.reward_sharpe(returns=self.returns)
         self.reward_buffer.reward_drawdown(returns=self.returns)

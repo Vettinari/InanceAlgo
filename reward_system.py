@@ -167,49 +167,46 @@ class DrawdownReward(Reward):
         return drawdown_reward
 
 
-possible_rewards = [TransactionReward, ActionReward, IntermediateReward,
-                    SharpeReward, DrawdownReward, TrendReward]
-
-
 class RewardBuffer:
     possible_rewards = [TransactionReward, ActionReward,
                         IntermediateReward, SharpeReward,
-                        DrawdownReward, TrendReward]
+                        DrawdownReward]
 
     def __init__(self):
-        self.rewards: List[Reward] = []
+        self.previous_history: dict = None
+        self.current_rewards: List[Reward] = []
         self.rewards_history: pd.DataFrame = pd.DataFrame(
-            columns=[reward_class.reward_type for reward_class in possible_rewards], index=[])
+            columns=[reward_class.reward_type for reward_class in self.possible_rewards], index=[])
         self.reset()
 
     def reward_transaction(self, position: Position):
-        self.rewards.append(TransactionReward(position=position))
+        self.current_rewards.append(TransactionReward(position=position))
 
     def reward_action(self, reward):
-        self.rewards.append(ActionReward(reward=reward))
+        self.current_rewards.append(ActionReward(reward=reward))
 
     def reward_intermediate(self, position: Position):
-        self.rewards.append(IntermediateReward(position=position))
+        self.current_rewards.append(IntermediateReward(position=position))
 
     def reward_trend(self, position: Position, rolling_average):
-        self.rewards.append(TrendReward(position_returns=position.profit_history,
-                                        market_returns=position.market_history,
-                                        rolling_average=rolling_average))
+        self.current_rewards.append(TrendReward(position_returns=position.profit_history,
+                                                market_returns=position.market_history,
+                                                rolling_average=rolling_average))
 
     def reward_sharpe(self, returns):
-        self.rewards.append(SharpeReward(returns=returns))
+        self.current_rewards.append(SharpeReward(returns=returns))
 
     def reward_drawdown(self, returns):
-        self.rewards.append(DrawdownReward(returns=returns))
+        self.current_rewards.append(DrawdownReward(returns=returns))
 
     def yield_rewards(self):
         self.update_history()
-        total_reward = sum(map(float, self.rewards))
+        total_reward = sum(map(float, self.current_rewards))
         self.reset()
         return total_reward
 
     def update_history(self):
-        update_dict = {reward_class.reward_type: reward_class.value for reward_class in self.rewards}
+        update_dict = {reward_class.reward_type: reward_class.value for reward_class in self.current_rewards}
         self.rewards_history = pd.concat([self.rewards_history, pd.DataFrame(update_dict, index=[0])],
                                          axis=0, ignore_index=True)
 
@@ -217,15 +214,31 @@ class RewardBuffer:
     def state(self):
         return self.__dict__['rewards']
 
-    def info(self, last_rows: int = 100):
-        temp = self.rewards_history.sum(axis=0)
-        pprint(temp.to_dict())
+    def get_info(self):
+        current_history = self.rewards_history.sum(axis=0)
 
-    def reset(self):
-        self.rewards = []
+        if self.previous_history is None:
+            self.previous_history = current_history
+
+        delta = {key: round(current_history[key] - self.previous_history[key], 3) for key, value in
+                 current_history.items()}
+
+        out = {key: f"{current_history[key]} - Δ:{delta[key]}" for key, value in self.previous_history.items()}
+        self.previous_history = current_history
+        return out
+
+    def get_log_info(self):
+        return {str(k): float(v) for k, v in self.rewards_history.sum(axis=0).items()}
+
+    def reset(self, history=False):
+        if history:
+            self.previous_history = None
+            self.rewards_history: pd.DataFrame = pd.DataFrame(
+                columns=[reward_class.reward_type for reward_class in self.possible_rewards], index=[])
+        self.current_rewards = []
 
     def __repr__(self):
-        return f"<RewardBuffer: Rewards={[str(reward) for reward in self.rewards]}>"
+        return f"<RewardBuffer: Rewards={[str(reward) for reward in self.current_rewards]}>"
 
 
 class ConsistencyReward(Reward):

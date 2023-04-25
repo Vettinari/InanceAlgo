@@ -1,0 +1,10 @@
+{'ActionReward': 0.0,
+ 'DrawdownReward': 0.0,
+ 'IntermediateReward': 0.0,
+ 'SharpeReward': 0.0,
+ 'TransactionReward': 0.0}
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 64, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 84, in step
+    time.sleep(60)

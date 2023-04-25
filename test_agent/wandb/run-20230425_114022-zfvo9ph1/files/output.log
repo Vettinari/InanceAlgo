@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 64, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 86, in step
+    self.connection.log(log_dict)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 370, in wrapper
+    return func(self, *args, **kwargs)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 333, in wrapper
+    return func(self, *args, **kwargs)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 1714, in log
+    self._log(data=data, step=step, commit=commit)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 1491, in _log
+    raise ValueError("wandb.log must be passed a dictionary")
+ValueError: wandb.log must be passed a dictionary

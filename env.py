@@ -1,8 +1,10 @@
+import time
 from pprint import pprint
 from typing import Tuple, List, Dict, Optional
 import gymnasium
 import numpy as np
 import pandas as pd
+import wandb
 from gym.core import ObsType
 from gymnasium import spaces
 
@@ -52,6 +54,10 @@ class TradeGym(gymnasium.Env):
         self.action_space = spaces.Discrete(n=len(risk_manager.action_dict.values()), start=0)
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(len(self.state),))
 
+        self.connection = wandb.init(entity="miloszbertman", project=f'TradingGym')
+        self.wandb_config = self.connection.config
+        self.wandb_config.log_interval = verbose
+
     def step(self, action) -> Tuple[np.array, float, bool, bool, dict]:
 
         if self.current_step >= (self.max_steps - 1) \
@@ -73,6 +79,12 @@ class TradeGym(gymnasium.Env):
             # Update wallet and environment elements for state generation
             self.update_wallet_and_env()
 
+            log_dict = self.risk_manager.reward_buffer.get_log_info()
+            log_dict.update({'Score': round(sum(self.rewards), 3),
+                             'Balance': self.risk_manager.wallet.total_balance,
+                             'Positions': len(self.risk_manager.wallet.closed_positions)})
+
+            self.connection.log(log_dict)
             self.reward = self.risk_manager.reward_buffer.yield_rewards()
             self.rewards.append(self.reward)
 
@@ -80,8 +92,9 @@ class TradeGym(gymnasium.Env):
                 print(f"{self.current_step}/{self.max_steps} "
                       f"Score: {round(sum(self.rewards), 3)} | "
                       f"Balance={self.risk_manager.wallet.total_balance}$ | "
+                      f"MaxBalance={self.risk_manager.wallet.max_balance}$ | "
                       f"Positions={len(self.risk_manager.wallet.closed_positions)}")
-                self.risk_manager.reward_buffer.info(self.verbose)
+                pprint(self.risk_manager.reward_buffer.get_info())
                 print()
 
             return self.state, self.reward, False, self.done, {}
@@ -108,7 +121,7 @@ class TradeGym(gymnasium.Env):
         self.update_states()
         self.generate_state()
         self.max_steps = self.data_pipeline.dataframe.shape[0] - self.data_pipeline.current_step
-        self.risk_manager.reward_buffer.reset()
+        self.risk_manager.reward_buffer.reset(history=True)
 
         return self.state, {}
 

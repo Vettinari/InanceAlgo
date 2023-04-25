@@ -1,0 +1,29 @@
+TransactionReward <class 'str'> 0.0 <class 'float'>
+ActionReward <class 'str'> 0.0 <class 'float'>
+IntermediateReward <class 'str'> 0.0 <class 'float'>
+SharpeReward <class 'str'> 0.0 <class 'float'>
+DrawdownReward <class 'str'> 0.0 <class 'float'>
+Score <class 'str'> 0 <class 'int'>
+Balance <class 'str'> 10000.0 <class 'numpy.float64'>
+Positions <class 'str'> 0 <class 'int'>
+TransactionReward <class 'str'> 0.0 <class 'float'>
+ActionReward <class 'str'> 0.01 <class 'float'>
+IntermediateReward <class 'str'> -0.00851 <class 'float'>
+SharpeReward <class 'str'> 0.0 <class 'float'>
+DrawdownReward <class 'str'> 0.0 <class 'float'>
+Score <class 'str'> 0.001 <class 'float'>
+Balance <class 'str'> 9991.49 <class 'numpy.float64'>
+Positions <class 'str'> 1 <class 'int'>
+TransactionReward <class 'str'> -8.51 <class 'float'>
+ActionReward <class 'str'> 0.02 <class 'float'>
+IntermediateReward <class 'str'> -0.01797 <class 'float'>
+SharpeReward <class 'str'> 0.0 <class 'float'>
+DrawdownReward <class 'str'> 0.0 <class 'float'>
+Score <class 'str'> -8.508 <class 'float'>
+Balance <class 'str'> 9982.03 <class 'numpy.float64'>
+Positions <class 'str'> 2 <class 'int'>
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 64, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 90, in step
+    time.sleep(30)

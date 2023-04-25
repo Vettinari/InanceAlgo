@@ -11,9 +11,7 @@ from test_agent.network_builder import NetworkBuilderDDDQN
 
 ticker = 'EURUSD'
 device = 'cuda' if T.cuda.is_available() else 'cpu'
-
 reward_buffer = RewardBuffer()
-
 risk_manager = RiskManager(ticker=ticker,
                            initial_balance=10000,
                            atr_stop_loss_ratios=[2, 4, 6],
@@ -21,17 +19,14 @@ risk_manager = RiskManager(ticker=ticker,
                            position_closing=True,
                            portfolio_risk=0.01,
                            reward_buffer=reward_buffer)
-
 data_pipeline = DataPipeline(ticker=ticker,
                              intervals=[15, 60, 240],
                              return_window=1,
                              chart_window=100)
-
 env = TradeGym(data_pipeline=data_pipeline,
                risk_manager=risk_manager,
-               reward_scaling=0.99)
-
-# env = gymnasium.make('CartPole-v1')
+               reward_scaling=0.99,
+               verbose=250)
 
 seed = 42
 np.random.seed(seed=seed)
@@ -41,16 +36,16 @@ np.set_printoptions(suppress=True)
 if __name__ == '__main__':
     num_games = 100
 
-    agent = Agent(learning_rate=0.002,
+    agent = Agent(learning_rate=0.001,
                   n_actions=env.action_space.n,
                   input_shape=env.observation_space.shape,
-                  l1_dims=512,
+                  l1_dims=256,
                   l2_dims=128,
                   memory_size=200000,
                   batch_size=128,
                   epsilon=1.0,
-                  eps_min=0.01,
-                  eps_dec=0.005,
+                  eps_min=0.001,
+                  eps_dec=0.0005,
                   replace_target_counter=250,
                   gamma=0.99)
 

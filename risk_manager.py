@@ -1,5 +1,7 @@
 from pprint import pprint
 
+import pandas as pd
+
 from DataProcessing.timeframe import OHLCT
 from reward_system import ActionReward, TransactionReward, IntermediateReward, RewardBuffer
 from wallet import Wallet
@@ -39,6 +41,8 @@ class RiskManager:
         self.action_dict = self._generate_action_space()
         self.stop_loss_type = stop_loss_type
         self.reward_buffer: RewardBuffer = reward_buffer
+
+        # self.action_history: pd.DataFrame = pd.DataFrame(columns=[], index=[])
 
     def _generate_action_space(self, ) -> dict:
         actions = ['long', 'short', 'hold']
