@@ -42,7 +42,7 @@ data_pipeline = DataPipeline(ticker=ticker,
 env = TradeGym(data_pipeline=data_pipeline,
                risk_manager=risk_manager,
                reward_scaling=0.99,
-               verbose=10,
+               verbose=5,
                wandb_logger=False)
 
 seed = 42

@@ -26,11 +26,9 @@ class Wallet:
         self.ticker = ticker.upper()
         self.initial_balance = initial_balance
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
-        self.position = None
-        self.current_ohlct = None
-        self.game_over = False
-        self.transaction_reward = None
-        self.intermediate_reward = None
+        self.position: Position = None
+        self.current_ohlct: OHLCT = None
+        self.game_over: bool = False
         self.closed_positions = []
         self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
         self.reward_buffer: RewardBuffer = reward_buffer
@@ -110,14 +108,25 @@ class Wallet:
             self.position = None
 
     @property
-    def state(self, include_balance=True):
+    def state(self, include_balance=True) -> list:
+        """
+        returns [balance, position_type, position_state] if include balance=True
+        position_type
+        :param include_balance:
+        :return list:
+        """
         balance = self.total_balance / (self.initial_balance * 10)
-        position_type = [0, 0] if self.position is None else [int(self.position.type == 'long'),
-                                                              int(self.position.type == 'short')]
+
+        position_type = 0
+        if self.position and self.position.type == 'long':
+            position_type = 1
+        elif self.position and self.position.type == 'short':
+            position_type = -1
+
         position_state = self.position.state if self.position is not None else [0, 0, 0]
 
         if include_balance:
-            return [balance, *position_type, *position_state]
+            return [balance, position_type, *position_state]
         else:
             return [*position_type, *position_state]
 

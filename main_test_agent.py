@@ -24,7 +24,7 @@ data_pipeline = DataPipeline(ticker=ticker,
                              intervals=[15, 60, 240],
                              return_window=1,
                              chart_window=100,
-                             test=True)
+                             test=False)
 
 env = TradeGym(data_pipeline=data_pipeline,
                risk_manager=risk_manager,
@@ -53,25 +53,26 @@ if __name__ == '__main__':
                   replace_target_counter=250,
                   gamma=0.99)
 
-    hidden_dims = np.array([128, 64, 32])
+    hidden_dims = np.array([256, 128, 64])
+    learning_rate = 0.005
 
     agent.Q_next = NetworkBuilderDDDQN(input_shape=env.observation_space.shape,
                                        hidden_dims=hidden_dims,
                                        activation='relu',
                                        weight_init=True,
-                                       learning_rate=0.001,
+                                       learning_rate=learning_rate,
                                        n_actions=env.action_space.n,
                                        optimizer='adam', loss='mse',
-                                       batch_norm=True, dropout=0.1)
+                                       batch_norm=True, dropout=False)
 
     agent.Q_eval = NetworkBuilderDDDQN(input_shape=env.observation_space.shape,
                                        hidden_dims=hidden_dims,
                                        activation='relu',
                                        weight_init=True,
-                                       learning_rate=0.001,
+                                       learning_rate=learning_rate,
                                        n_actions=env.action_space.n,
                                        optimizer='adam', loss='mse',
-                                       batch_norm=True, dropout=0.1)
+                                       batch_norm=True, dropout=False)
 
     scores = []
     eps_history = []

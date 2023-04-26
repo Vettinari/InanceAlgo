@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 89, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 92, in step
+    log_dict.update(self.current_ohlct.close)
+TypeError: 'numpy.float64' object is not iterable

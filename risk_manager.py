@@ -49,16 +49,22 @@ class RiskManager:
         self.reward_buffer: RewardBuffer = reward_buffer
         self.idle_time = 0
 
-        self.action_history: dict = {str(action): 0 for action in self.action_dict.values()}
-        self.current_action_bin: dict = {str(action): 0 for action in self.action_dict.values()}
+        self._action_history: dict = {str(action): 0 for action in self.action_dict.values()}
+        self._current_sentiment: dict = dict(zip(['short', 'long', 'close', 'hold'], [0, 0, 0, 0]))
 
-    def reset_action_bin(self):
-        self.current_action_bin = {str(action): 0 for action in self.action_dict.values()}
+    def reset(self):
+        self._current_sentiment = dict(zip(['short', 'long', 'close', 'hold'], [0, 0, 0, 0]))
+        self._action_history: dict = {str(action): 0 for action in self.action_dict.values()}
 
-    def yield_action_bin(self):
-        out = self.current_action_bin
-        self.reset_action_bin()
+    @property
+    def sentiment(self):
+        out = self._current_sentiment
+        self._current_sentiment = dict(zip(['short', 'long', 'close', 'hold'], [0, 0, 0, 0]))
         return out
+
+    @property
+    def action_history(self):
+        return self._action_history
 
     def _generate_action_space(self, ) -> dict:
         actions = ['long', 'short', 'hold']
@@ -98,9 +104,12 @@ class RiskManager:
         return flag
 
     def execute_action(self, action_index: int, current_atr: float):
+        # Get Action object
         action = self.action_dict[action_index]
-        self.action_history[str(action)] += 1
-        self.current_action_bin[str(action)] = 1
+        # Update action history
+        self._action_history[str(action)] += 1
+        # Update current_sentiment
+        self._current_sentiment[action.action] = 1 * action.risk_reward if action.risk_reward else 1
 
         if self._validate_action(action=action.action):
             if action.action == "close":

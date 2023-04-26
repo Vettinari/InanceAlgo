@@ -87,7 +87,9 @@ class TradeGym(gymnasium.Env):
                 log_dict.update({'total_score': round(sum(self.rewards), 3),
                                  'wallet_balance': self.risk_manager.wallet.total_balance,
                                  'position_count': len(self.risk_manager.wallet.closed_positions)})
-                log_dict.update(self.risk_manager.yield_action_bin())
+                log_dict.update(self.risk_manager.action_history)
+                log_dict.update(self.risk_manager.sentiment)
+                log_dict.update({'price_action': self.current_ohlct.close})
                 self.connection.log(log_dict)
 
             self.reward = self.risk_manager.reward_buffer.yield_rewards()
@@ -99,7 +101,7 @@ class TradeGym(gymnasium.Env):
                       f"Balance={self.risk_manager.wallet.total_balance}$ | "
                       f"MaxBalance={self.risk_manager.wallet.max_balance}$ | "
                       f"Positions={len(self.risk_manager.wallet.closed_positions)}")
-                pprint(self.risk_manager.reward_buffer.get_log_info())
+                self.risk_manager.reward_buffer.info()
                 print()
 
             return self.state, self.reward, False, self.done, {}
@@ -127,7 +129,6 @@ class TradeGym(gymnasium.Env):
         self.generate_state()
         self.max_steps = self.data_pipeline.dataframe.shape[0] - self.data_pipeline.current_step
         self.risk_manager.reward_buffer.reset(history=True)
-        self.risk_manager.action_history = {str(action): 0 for action in self.risk_manager.action_dict.values()}
 
         self.connection = wandb.init(entity="miloszbertman", project='TradingGym')
         self.connection.config.log_interval = self.verbose
@@ -150,10 +151,10 @@ class TradeGym(gymnasium.Env):
         self.tech_state = np.hstack(tech).flatten()
 
     def generate_state(self, include_ohlct_data=False):
+        # wallet state
         if include_ohlct_data:
             self.state = np.hstack([self.wallet_state, self.data_state, self.tech_state])
-
-        self.state = np.hstack([self.wallet_state, self.tech_state])
+        self.state = np.hstack([self.current_ohlct.close, self.wallet_state, self.tech_state])
 
     def __repr__(self):
         return f'<TradeGym:\n' \

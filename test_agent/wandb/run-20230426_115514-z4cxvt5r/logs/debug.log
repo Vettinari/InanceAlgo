@@ -1,0 +1,320 @@
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115514-z4cxvt5r/logs/debug.log
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115514-z4cxvt5r/logs/debug-internal.log
+2023-04-26 11:55:14,584 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:55:14,585 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:55:14,585 INFO    MainThread:65852 [wandb_init.py:init():590] wandb.init() called when a run is still active
+2023-04-26 11:55:14,585 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b9da56050>>
+2023-04-26 11:55:14,585 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:55:19,522 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/j89rr90v
+2023-04-26 11:55:19,523 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:55:19,523 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:55:19,523 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:55:22,683 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:55:22,686 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:55:22,689 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:55:22,816 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115522-qsus6fug/logs/debug.log
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115522-qsus6fug/logs/debug-internal.log
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:55:22,817 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:55:22,818 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:55:22,821 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:55:22,824 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:55:22,828 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:55:22,851 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:55:24,151 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:55:24,237 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:55:24,237 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:55:28,172 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:55:28,173 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:55:28,173 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:55:28,173 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:55:28,174 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:55:28,175 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b5a81f2b0>>
+2023-04-26 11:55:28,175 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:55:39,754 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/qsus6fug
+2023-04-26 11:55:39,755 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:55:39,755 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:55:39,755 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:55:44,443 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:55:44,445 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:55:44,449 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:55:44,583 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:55:44,583 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:55:44,583 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:55:44,583 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115544-r1rv439c/logs/debug.log
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115544-r1rv439c/logs/debug-internal.log
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:55:44,584 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:55:44,585 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:55:44,585 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:55:44,590 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:55:44,594 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:55:44,600 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:55:44,625 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:55:45,838 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:55:45,903 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:55:45,903 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:55:50,241 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:55:50,242 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:55:50,242 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:55:50,243 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:55:50,243 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:55:50,244 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68e7c370>>
+2023-04-26 11:55:50,244 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:56:07,127 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/r1rv439c
+2023-04-26 11:56:07,128 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:56:07,128 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:56:07,128 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:56:10,903 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:56:10,905 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:56:10,908 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:56:11,045 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:56:11,045 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:56:11,045 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115611-nggpwxvx/logs/debug.log
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115611-nggpwxvx/logs/debug-internal.log
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:56:11,046 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:56:11,047 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:56:11,047 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:56:11,051 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:56:11,055 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:56:11,061 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:56:11,087 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:56:12,364 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:56:12,439 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:56:12,439 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:56:16,898 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:56:16,898 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:56:16,899 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:56:16,899 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:56:16,899 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:56:16,900 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68f0c040>>
+2023-04-26 11:56:16,900 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:56:35,704 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/nggpwxvx
+2023-04-26 11:56:35,704 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:56:35,705 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:56:35,705 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:56:39,553 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:56:39,556 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:56:39,559 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:56:39,662 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:56:39,662 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:56:39,662 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:56:39,662 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115639-8wrsnd7n/logs/debug.log
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115639-8wrsnd7n/logs/debug-internal.log
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:56:39,663 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:56:39,668 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:56:39,671 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:56:39,676 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:56:39,702 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:56:40,941 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:56:41,016 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:56:41,016 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:56:45,323 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:56:45,324 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:56:45,324 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:56:45,325 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:56:45,325 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:56:45,326 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68e2cc10>>
+2023-04-26 11:56:45,326 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:56:57,107 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/8wrsnd7n
+2023-04-26 11:56:57,107 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:56:57,108 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:56:57,108 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:57:01,119 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:57:01,122 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:57:01,126 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:57:01,247 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115701-j70w6ywx/logs/debug.log
+2023-04-26 11:57:01,248 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115701-j70w6ywx/logs/debug-internal.log
+2023-04-26 11:57:01,248 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:57:01,248 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:57:01,248 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:57:01,248 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:57:01,252 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:57:01,255 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:57:01,260 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:57:01,285 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:57:02,476 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:57:02,546 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:57:02,546 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:57:06,741 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:57:06,742 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:57:06,742 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:57:06,743 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:57:06,743 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:57:06,743 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68ed21a0>>
+2023-04-26 11:57:06,744 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:57:19,513 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/j70w6ywx
+2023-04-26 11:57:19,514 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:57:19,514 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:57:19,514 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:57:23,609 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:57:23,611 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:57:23,614 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:57:23,749 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:57:23,749 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:57:23,749 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:57:23,749 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:57:23,749 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115723-jk6z4fbv/logs/debug.log
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115723-jk6z4fbv/logs/debug-internal.log
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:57:23,750 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:57:23,755 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:57:23,758 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:57:23,764 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:57:23,788 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:57:24,994 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:57:25,066 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:57:25,066 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:57:28,956 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:57:28,956 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:57:28,956 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:57:28,956 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:57:28,957 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:57:28,958 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68ef0100>>
+2023-04-26 11:57:28,958 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:57:47,791 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/jk6z4fbv
+2023-04-26 11:57:47,791 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:57:47,792 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:57:47,792 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:57:51,313 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:57:51,316 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:57:51,319 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:57:51,443 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115751-kgbxvn19/logs/debug.log
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115751-kgbxvn19/logs/debug-internal.log
+2023-04-26 11:57:51,444 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:57:51,445 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:57:51,445 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:57:51,445 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:57:51,448 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:57:51,452 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:57:51,456 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:57:51,480 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:57:52,688 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:57:52,747 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:57:52,747 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:57:56,502 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:57:56,502 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:57:56,503 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:57:56,503 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:57:56,503 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:57:56,504 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b68e26590>>
+2023-04-26 11:57:56,504 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:58:16,803 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/kgbxvn19
+2023-04-26 11:58:16,804 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:58:16,804 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:58:16,804 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:58:20,836 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:58:20,839 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:58:20,843 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:58:20,958 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115820-q3zkh3cl/logs/debug.log
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115820-q3zkh3cl/logs/debug-internal.log
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:58:20,959 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:58:20,963 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:58:20,967 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:58:20,972 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:58:20,998 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:58:22,351 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:58:22,426 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:58:22,427 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:58:26,678 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:58:26,679 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:58:26,680 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:58:26,680 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:58:26,680 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:58:26,681 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b6c2ed2a0>>
+2023-04-26 11:58:26,681 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:58:52,145 INFO    MainThread:65852 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/q3zkh3cl
+2023-04-26 11:58:52,145 INFO    MainThread:65852 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:58:52,146 INFO    MainThread:65852 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:58:52,146 INFO    MainThread:65852 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:58:55,613 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:58:55,615 INFO    MainThread:65852 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:58:55,617 INFO    MainThread:65852 [wandb_run.py:_footer_sync_info():3434] logging synced files
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Configure stats pid to 65852
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/settings
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_test_agent.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py'}
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115855-yspl8dhn/logs/debug.log
+2023-04-26 11:58:55,732 INFO    MainThread:65852 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_115855-yspl8dhn/logs/debug-internal.log
+2023-04-26 11:58:55,733 INFO    MainThread:65852 [wandb_init.py:init():547] calling init triggers
+2023-04-26 11:58:55,733 INFO    MainThread:65852 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-26 11:58:55,733 INFO    MainThread:65852 [wandb_init.py:init():595] starting backend
+2023-04-26 11:58:55,733 INFO    MainThread:65852 [wandb_init.py:init():599] setting up manager
+2023-04-26 11:58:55,737 INFO    MainThread:65852 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2023-04-26 11:58:55,741 INFO    MainThread:65852 [wandb_init.py:init():605] backend started and connected
+2023-04-26 11:58:55,745 INFO    MainThread:65852 [wandb_init.py:init():695] updated telemetry
+2023-04-26 11:58:55,769 INFO    MainThread:65852 [wandb_init.py:init():732] communicating run to backend with 60.0 second timeout
+2023-04-26 11:58:57,013 INFO    MainThread:65852 [wandb_run.py:_on_init():2176] communicating current version
+2023-04-26 11:58:57,084 INFO    MainThread:65852 [wandb_run.py:_on_init():2185] got version response 
+2023-04-26 11:58:57,084 INFO    MainThread:65852 [wandb_init.py:init():782] starting run threads in backend
+2023-04-26 11:59:00,790 INFO    MainThread:65852 [wandb_run.py:_console_start():2157] atexit reg
+2023-04-26 11:59:00,790 INFO    MainThread:65852 [wandb_run.py:_redirect():2012] redirect: SettingsConsole.WRAP_RAW
+2023-04-26 11:59:00,790 INFO    MainThread:65852 [wandb_run.py:_redirect():2077] Wrapping output streams.
+2023-04-26 11:59:00,791 INFO    MainThread:65852 [wandb_run.py:_redirect():2102] Redirects installed.
+2023-04-26 11:59:00,791 INFO    MainThread:65852 [wandb_init.py:init():824] run started, returning control to user process
+2023-04-26 11:59:00,792 INFO    MainThread:65852 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f9b6c2e77f0>>
+2023-04-26 11:59:00,792 INFO    MainThread:65852 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None

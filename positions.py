@@ -1,5 +1,5 @@
 import operator
-from typing import Callable
+from typing import Callable, List
 
 import Utils
 from DataProcessing.timeframe import OHLCT
@@ -152,7 +152,10 @@ class Position:
         )
 
     @property
-    def state(self):
+    def state(self) -> List[float]:
+        """
+        :return: [stop_loss_level, stop_profit level, unrealized_profit]
+        """
         return [self.stop_loss, self.stop_profit, self.unrealized_profit]
 
     def __repr__(self):

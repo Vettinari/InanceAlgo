@@ -1,0 +1,42 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.10.9",
+    "heartbeatAt": "2023-04-26T09:38:58.564934",
+    "startedAt": "2023-04-26T09:38:57.255556",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py",
+    "codePath": "main_test_agent.py",
+    "git": {
+        "remote": "https://github.com/Vettinari/InanceAlgo.git",
+        "commit": "1cd7856a174d0cd57410f8bad0dea4a9f4e016b9"
+    },
+    "email": "milosz.bertman@gmail.com",
+    "root": "/Users/milosz/Documents/Pycharm/InanceAlgo",
+    "host": "MacBook-Pro-van-SML-MD6T.local",
+    "username": "milosz",
+    "executable": "/Users/milosz/opt/anaconda3/envs/Inance/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2300,
+        "min": 2300,
+        "max": 2300
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300,
+            "min": 2300,
+            "max": 2300
+        }
+    ],
+    "disk": {
+        "total": 891.2763442993164,
+        "used": 14.143569946289062
+    },
+    "memory": {
+        "total": 32.0
+    }
+}
