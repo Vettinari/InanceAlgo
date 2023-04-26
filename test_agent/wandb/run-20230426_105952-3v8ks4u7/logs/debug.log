@@ -53,3 +53,10 @@ config: {}
 2023-04-26 10:59:57,551 INFO    MainThread:63778 [wandb_init.py:init():590] wandb.init() called when a run is still active
 2023-04-26 10:59:57,551 INFO    MainThread:63778 [wandb_config.py:__setitem__():152] config set log_interval = 250 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f7aa054e920>>
 2023-04-26 10:59:57,552 INFO    MainThread:63778 [wandb_run.py:_config_callback():1285] config_cb log_interval 250 None
+2023-04-26 11:00:03,388 INFO    MainThread:63778 [wandb_run.py:_finish():1892] finishing run miloszbertman/TradingGym/3v8ks4u7
+2023-04-26 11:00:03,388 INFO    MainThread:63778 [wandb_run.py:_atexit_cleanup():2126] got exitcode: 0
+2023-04-26 11:00:03,388 INFO    MainThread:63778 [wandb_run.py:_restore():2109] restore
+2023-04-26 11:00:03,388 INFO    MainThread:63778 [wandb_run.py:_restore():2115] restore done
+2023-04-26 11:00:10,034 INFO    MainThread:63778 [wandb_run.py:_footer_history_summary_info():3476] rendering history
+2023-04-26 11:00:10,036 INFO    MainThread:63778 [wandb_run.py:_footer_history_summary_info():3508] rendering summary
+2023-04-26 11:00:10,040 INFO    MainThread:63778 [wandb_run.py:_footer_sync_info():3434] logging synced files

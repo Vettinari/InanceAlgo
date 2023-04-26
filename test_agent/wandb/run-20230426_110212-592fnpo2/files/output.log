@@ -1,0 +1,6 @@
+250/1664 Score: -3124.569 | Balance=10500.75$ | MaxBalance=10636.62$ | Positions=61
+{'ActionReward': -3790.0,
+ 'DrawdownReward': -39.57245360583626,
+ 'IntermediateReward': 0.7317500000000001,
+ 'SharpeReward': 4.355754688024337,
+ 'TransactionReward': 533.4600000000003}
