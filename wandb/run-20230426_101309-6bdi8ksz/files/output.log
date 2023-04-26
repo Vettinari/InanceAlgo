@@ -1,0 +1,61 @@
+Risk manager:
+Initial balance: 10000
+Stop losses: [2, 4]
+Risk/Reward ratios: [1.5, 2, 3]
+Trade risk: 200.0
+Action space: 14
+{0: Action(long, sl: 2, rr: 1.5),
+ 1: Action(long, sl: 4, rr: 1.5),
+ 2: Action(long, sl: 2, rr: 2),
+ 3: Action(long, sl: 4, rr: 2),
+ 4: Action(long, sl: 2, rr: 3),
+ 5: Action(long, sl: 4, rr: 3),
+ 6: Action(short, sl: 2, rr: 1.5),
+ 7: Action(short, sl: 4, rr: 1.5),
+ 8: Action(short, sl: 2, rr: 2),
+ 9: Action(short, sl: 4, rr: 2),
+ 10: Action(short, sl: 2, rr: 3),
+ 11: Action(short, sl: 4, rr: 3),
+ 12: Action(hold, sl: None, rr: None),
+ 13: Action(close, sl: None, rr: None)}
+None
+Choose action:::::::::::::::::::::::: Wallet info :::::::::::::::::::::::
+Free: 6733.33$ | Margin: 3266.67$ | Total: 10000.0$
+----------------------- LONG : OPEN -----------------------
+Order number: None
+Open at: 2022-12-13 11:00:00 - 1:30 leverage.
+Open price: 1.05302$ - Volume: 0.98
+Stop loss: 1.0508600000000001$ - Stop profit: 1.05626$ - RR: 1.5x
+Unrealized profit: 38.14$ - Position risk: 200.0$
+Margin: 3266.67$ - Contract value: 98000$
+-----------------------------------------------------------
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+None
+Choose action:::::::::::::::::::::::: Wallet info :::::::::::::::::::::::
+Free: 6733.33$ | Margin: 3266.67$ | Total: 10000.0$
+----------------------- LONG : OPEN -----------------------
+Order number: None
+Open at: 2022-12-13 11:00:00 - 1:30 leverage.
+Open price: 1.05302$ - Volume: 0.98
+Stop loss: 1.0508600000000001$ - Stop profit: 1.05626$ - RR: 1.5x
+Unrealized profit: -2.79$ - Position risk: 200.0$
+Margin: 3266.67$ - Contract value: 98000$
+-----------------------------------------------------------
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+None
+Choose action:::::::::::::::::::::::: Wallet info :::::::::::::::::::::::
+Free: 6733.33$ | Margin: 3266.67$ | Total: 10000.0$
+----------------------- LONG : OPEN -----------------------
+Order number: None
+Open at: 2022-12-13 11:00:00 - 1:30 leverage.
+Open price: 1.05302$ - Volume: 0.98
+Stop loss: 1.0508600000000001$ - Stop profit: 1.05626$ - RR: 1.5x
+Unrealized profit: 46.51$ - Position risk: 200.0$
+Margin: 3266.67$ - Contract value: 98000$
+-----------------------------------------------------------
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+None
+Choose action:::::::::::::::::::::::: Wallet info :::::::::::::::::::::::
+Free: 10046.51$ | Margin: 0$ | Total: 10046.51$
+::::::::::::::::::: No opened positions :::::::::::::::::::
+None

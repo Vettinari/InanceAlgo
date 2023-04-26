@@ -14,7 +14,7 @@ import gymnasium as gym
 from DataProcessing.data_pipeline import DataPipeline
 from env import TradeGym
 from positions import Position, Long
-from reward_system import RewardBuffer
+from reward_buffer import RewardBuffer
 from risk_manager import RiskManager
 
 pd.set_option('display.max_rows', 500)
@@ -25,13 +25,12 @@ ticker = 'EURUSD'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 reward_buffer = RewardBuffer()
-
 risk_manager = RiskManager(ticker=ticker,
                            initial_balance=10000,
-                           atr_stop_loss_ratios=[2],
-                           risk_reward_ratios=[1.5],
+                           atr_stop_loss_ratios=[2, 4],
+                           risk_reward_ratios=[1.5, 2, 3],
                            position_closing=True,
-                           portfolio_risk=0.01,
+                           portfolio_risk=0.02,
                            reward_buffer=reward_buffer)
 
 data_pipeline = DataPipeline(ticker=ticker,
@@ -42,7 +41,9 @@ data_pipeline = DataPipeline(ticker=ticker,
 
 env = TradeGym(data_pipeline=data_pipeline,
                risk_manager=risk_manager,
-               reward_scaling=0.99)
+               reward_scaling=0.99,
+               verbose=10,
+               wandb_logger=False)
 
 seed = 42
 np.random.seed(seed=seed)
@@ -57,5 +58,4 @@ if __name__ == '__main__':
         if action == 9:
             break
         env.step(action=action)
-
-    env.risk_manager.reward_buffer.info()
+        print(env.risk_manager.wallet.info())

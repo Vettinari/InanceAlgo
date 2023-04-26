@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 65, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 87, in step
+    wandb.Table(data=[[action, amount] for action, amount in self.risk_manager.action_history],
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 87, in <listcomp>
+    wandb.Table(data=[[action, amount] for action, amount in self.risk_manager.action_history],
+ValueError: too many values to unpack (expected 2)

@@ -1,0 +1,34 @@
+2023-04-25 13:40:51,577 INFO    StreamThr :50302 [internal.py:wandb_internal():86] W&B internal server running at pid: 50302, started at: 2023-04-25 13:40:51.576678
+2023-04-25 13:40:51,578 DEBUG   HandlerThread:50302 [handler.py:handle_request():144] handle_request: status
+2023-04-25 13:40:51,583 INFO    WriterThread:50302 [datastore.py:open_for_write():85] open: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_134051-n6xk42i1/run-n6xk42i1.wandb
+2023-04-25 13:40:51,584 DEBUG   SenderThread:50302 [sender.py:send():375] send: header
+2023-04-25 13:40:51,608 DEBUG   SenderThread:50302 [sender.py:send():375] send: run
+2023-04-25 13:40:51,999 INFO    SenderThread:50302 [dir_watcher.py:__init__():219] watching files in: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_134051-n6xk42i1/files
+2023-04-25 13:40:52,000 INFO    SenderThread:50302 [sender.py:_start_run_threads():1124] run started: n6xk42i1 with start time 1682422851.578774
+2023-04-25 13:40:52,000 DEBUG   SenderThread:50302 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:40:52,000 INFO    SenderThread:50302 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:40:52,004 DEBUG   HandlerThread:50302 [handler.py:handle_request():144] handle_request: check_version
+2023-04-25 13:40:52,005 DEBUG   SenderThread:50302 [sender.py:send_request():402] send_request: check_version
+2023-04-25 13:40:52,068 DEBUG   HandlerThread:50302 [handler.py:handle_request():144] handle_request: run_start
+2023-04-25 13:40:52,079 DEBUG   HandlerThread:50302 [system_info.py:__init__():31] System info init
+2023-04-25 13:40:52,079 DEBUG   HandlerThread:50302 [system_info.py:__init__():46] System info init done
+2023-04-25 13:40:52,079 INFO    HandlerThread:50302 [system_monitor.py:start():181] Starting system monitor
+2023-04-25 13:40:52,080 INFO    SystemMonitor:50302 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-04-25 13:40:52,080 INFO    HandlerThread:50302 [system_monitor.py:probe():201] Collecting system info
+2023-04-25 13:40:52,081 DEBUG   HandlerThread:50302 [system_info.py:probe():195] Probing system
+2023-04-25 13:40:52,081 INFO    SystemMonitor:50302 [interfaces.py:start():190] Started cpu monitoring
+2023-04-25 13:40:52,082 INFO    SystemMonitor:50302 [interfaces.py:start():190] Started disk monitoring
+2023-04-25 13:40:52,083 INFO    SystemMonitor:50302 [interfaces.py:start():190] Started memory monitoring
+2023-04-25 13:40:52,084 INFO    SystemMonitor:50302 [interfaces.py:start():190] Started network monitoring
+2023-04-25 13:40:52,094 DEBUG   HandlerThread:50302 [system_info.py:_probe_git():180] Probing git
+2023-04-25 13:40:52,126 DEBUG   HandlerThread:50302 [system_info.py:_probe_git():188] Probing git done
+2023-04-25 13:40:52,127 DEBUG   HandlerThread:50302 [system_info.py:probe():240] Probing system done
+2023-04-25 13:40:52,127 DEBUG   HandlerThread:50302 [system_monitor.py:probe():210] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.9', 'heartbeatAt': '2023-04-25T11:40:52.081826', 'startedAt': '2023-04-25T11:40:51.566102', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py', 'codePath': 'main_test_agent.py', 'git': {'remote': 'https://github.com/Vettinari/InanceAlgo.git', 'commit': 'a15ad59f034b128cc154801105308586ec127875'}, 'email': 'milosz.bertman@gmail.com', 'root': '/Users/milosz/Documents/Pycharm/InanceAlgo', 'host': 'MacBook-Pro-van-SML-MD6T.local', 'username': 'milosz', 'executable': '/Users/milosz/opt/anaconda3/envs/Inance/bin/python', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 2300, 'min': 2300, 'max': 2300}, 'cpu_freq_per_core': [{'current': 2300, 'min': 2300, 'max': 2300}], 'disk': {'total': 891.2763442993164, 'used': 14.143569946289062}, 'memory': {'total': 32.0}}
+2023-04-25 13:40:52,127 INFO    HandlerThread:50302 [system_monitor.py:probe():211] Finished collecting system info
+2023-04-25 13:40:52,127 INFO    HandlerThread:50302 [system_monitor.py:probe():214] Publishing system info
+2023-04-25 13:40:52,127 DEBUG   HandlerThread:50302 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-04-25 13:40:52,128 DEBUG   HandlerThread:50302 [system_info.py:_save_pip():67] Saving pip packages done
+2023-04-25 13:40:52,128 DEBUG   HandlerThread:50302 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-04-25 13:40:53,010 INFO    Thread-12 :50302 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_134051-n6xk42i1/files/requirements.txt
+2023-04-25 13:40:53,011 INFO    Thread-12 :50302 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_134051-n6xk42i1/files/conda-environment.yaml
+2023-04-25 13:40:53,012 INFO    Thread-12 :50302 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_134051-n6xk42i1/files/wandb-summary.json

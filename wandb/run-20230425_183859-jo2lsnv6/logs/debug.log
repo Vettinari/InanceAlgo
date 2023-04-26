@@ -1,0 +1,14 @@
+2023-04-25 18:38:59,059 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Configure stats pid to 56240
+2023-04-25 18:38:59,060 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/.config/wandb/settings
+2023-04-25 18:38:59,060 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Loading settings from /Users/milosz/Documents/Pycharm/InanceAlgo/wandb/settings
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main_debug.py', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_debug.py'}
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_init.py:_log_setup():507] Logging user logs to /Users/milosz/Documents/Pycharm/InanceAlgo/wandb/run-20230425_183859-jo2lsnv6/logs/debug.log
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_init.py:_log_setup():508] Logging internal logs to /Users/milosz/Documents/Pycharm/InanceAlgo/wandb/run-20230425_183859-jo2lsnv6/logs/debug-internal.log
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_init.py:init():547] calling init triggers
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-04-25 18:38:59,061 INFO    MainThread:56240 [wandb_init.py:init():590] wandb.init() called when a run is still active
+2023-04-25 18:38:59,062 INFO    MainThread:56240 [wandb_config.py:__setitem__():152] config set log_interval = 200 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7fbe6848f190>>
+2023-04-25 18:38:59,062 INFO    MainThread:56240 [wandb_run.py:_config_callback():1285] config_cb log_interval 200 None

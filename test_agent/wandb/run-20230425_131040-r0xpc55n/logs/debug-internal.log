@@ -1,0 +1,320 @@
+2023-04-25 13:10:40,017 INFO    StreamThr :49249 [internal.py:wandb_internal():86] W&B internal server running at pid: 49249, started at: 2023-04-25 13:10:40.017160
+2023-04-25 13:10:40,019 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status
+2023-04-25 13:10:40,029 INFO    WriterThread:49249 [datastore.py:open_for_write():85] open: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/run-r0xpc55n.wandb
+2023-04-25 13:10:40,030 DEBUG   SenderThread:49249 [sender.py:send():375] send: header
+2023-04-25 13:10:40,066 DEBUG   SenderThread:49249 [sender.py:send():375] send: run
+2023-04-25 13:10:40,457 INFO    SenderThread:49249 [dir_watcher.py:__init__():219] watching files in: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files
+2023-04-25 13:10:40,457 INFO    SenderThread:49249 [sender.py:_start_run_threads():1124] run started: r0xpc55n with start time 1682421040.020656
+2023-04-25 13:10:40,457 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:10:40,458 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:10:40,465 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: check_version
+2023-04-25 13:10:40,466 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: check_version
+2023-04-25 13:10:40,534 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: run_start
+2023-04-25 13:10:40,548 DEBUG   HandlerThread:49249 [system_info.py:__init__():31] System info init
+2023-04-25 13:10:40,549 DEBUG   HandlerThread:49249 [system_info.py:__init__():46] System info init done
+2023-04-25 13:10:40,549 INFO    HandlerThread:49249 [system_monitor.py:start():181] Starting system monitor
+2023-04-25 13:10:40,549 INFO    SystemMonitor:49249 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-04-25 13:10:40,551 INFO    HandlerThread:49249 [system_monitor.py:probe():201] Collecting system info
+2023-04-25 13:10:40,551 DEBUG   HandlerThread:49249 [system_info.py:probe():195] Probing system
+2023-04-25 13:10:40,552 INFO    SystemMonitor:49249 [interfaces.py:start():190] Started cpu monitoring
+2023-04-25 13:10:40,552 INFO    SystemMonitor:49249 [interfaces.py:start():190] Started disk monitoring
+2023-04-25 13:10:40,553 INFO    SystemMonitor:49249 [interfaces.py:start():190] Started memory monitoring
+2023-04-25 13:10:40,559 INFO    SystemMonitor:49249 [interfaces.py:start():190] Started network monitoring
+2023-04-25 13:10:40,568 DEBUG   HandlerThread:49249 [system_info.py:_probe_git():180] Probing git
+2023-04-25 13:10:40,618 DEBUG   HandlerThread:49249 [system_info.py:_probe_git():188] Probing git done
+2023-04-25 13:10:40,619 DEBUG   HandlerThread:49249 [system_info.py:probe():240] Probing system done
+2023-04-25 13:10:40,619 DEBUG   HandlerThread:49249 [system_monitor.py:probe():210] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.9', 'heartbeatAt': '2023-04-25T11:10:40.551875', 'startedAt': '2023-04-25T11:10:40.000975', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py', 'codePath': 'main_test_agent.py', 'git': {'remote': 'https://github.com/Vettinari/InanceAlgo.git', 'commit': 'a15ad59f034b128cc154801105308586ec127875'}, 'email': 'milosz.bertman@gmail.com', 'root': '/Users/milosz/Documents/Pycharm/InanceAlgo', 'host': 'MacBook-Pro-van-SML-MD6T.local', 'username': 'milosz', 'executable': '/Users/milosz/opt/anaconda3/envs/Inance/bin/python', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 2300, 'min': 2300, 'max': 2300}, 'cpu_freq_per_core': [{'current': 2300, 'min': 2300, 'max': 2300}], 'disk': {'total': 891.2763442993164, 'used': 14.143569946289062}, 'memory': {'total': 32.0}}
+2023-04-25 13:10:40,620 INFO    HandlerThread:49249 [system_monitor.py:probe():211] Finished collecting system info
+2023-04-25 13:10:40,620 INFO    HandlerThread:49249 [system_monitor.py:probe():214] Publishing system info
+2023-04-25 13:10:40,620 DEBUG   HandlerThread:49249 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-04-25 13:10:40,621 DEBUG   HandlerThread:49249 [system_info.py:_save_pip():67] Saving pip packages done
+2023-04-25 13:10:40,621 DEBUG   HandlerThread:49249 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-04-25 13:10:41,467 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/conda-environment.yaml
+2023-04-25 13:10:41,468 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/requirements.txt
+2023-04-25 13:10:41,469 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:10:47,795 DEBUG   HandlerThread:49249 [system_info.py:_save_conda():86] Saving conda packages done
+2023-04-25 13:10:47,796 INFO    HandlerThread:49249 [system_monitor.py:probe():216] Finished publishing system info
+2023-04-25 13:10:47,804 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:10:47,804 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: keepalive
+2023-04-25 13:10:47,805 DEBUG   SenderThread:49249 [sender.py:send():375] send: files
+2023-04-25 13:10:47,805 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-04-25 13:10:47,816 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:10:47,816 DEBUG   SenderThread:49249 [sender.py:send():375] send: telemetry
+2023-04-25 13:10:47,817 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:10:47,949 ERROR   Thread-11 (_thread_body):49249 [step_upload.py:_handle_event():196] Failed to upload file: /var/folders/5j/x1mmgnwn0rx3_1zs9npqwwvr0000gp/T/tmpcrimqgxiwandb/a2y0vg3o-wandb-metadata.json
+Traceback (most recent call last):
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/apis/normalize.py", line 41, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py", line 1859, in upload_urls
+    run_obj = query_result["model"]["bucket"]
+TypeError: 'NoneType' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/filesync/step_upload.py", line 284, in run_and_notify
+    self._do_upload_sync(event)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/filesync/step_upload.py", line 330, in _do_upload_sync
+    job.run()
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/filesync/upload_job.py", line 61, in run
+    self.push()
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/filesync/upload_job.py", line 112, in push
+    _, upload_headers, result = self._api.upload_urls(project, [self.save_name])
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/apis/normalize.py", line 87, in wrapper
+    raise CommError(message, err).with_traceback(sys.exc_info()[2])
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/apis/normalize.py", line 41, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/milosz/opt/anaconda3/envs/Inance/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py", line 1859, in upload_urls
+    run_obj = query_result["model"]["bucket"]
+wandb.errors.CommError: 'NoneType' object is not subscriptable
+2023-04-25 13:10:47,986 DEBUG   SenderThread:49249 [sender.py:send():375] send: telemetry
+2023-04-25 13:10:47,986 DEBUG   SenderThread:49249 [sender.py:send():375] send: config
+2023-04-25 13:10:48,494 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/conda-environment.yaml
+2023-04-25 13:10:48,494 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-metadata.json
+2023-04-25 13:10:48,494 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:10:50,502 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:10:51,121 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:10:56,138 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:01,154 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:02,816 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:11:02,817 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:11:06,974 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:11,997 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:12,591 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/config.yaml
+2023-04-25 13:11:17,278 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:17,819 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:11:17,820 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:11:18,112 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:11:18,114 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:11:18,114 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:11:18,115 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:11:18,613 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:11:20,623 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:11:23,213 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:28,238 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:32,826 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:11:32,827 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:11:33,987 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:39,007 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:40,562 DEBUG   SystemMonitor:49249 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-04-25 13:11:40,563 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:11:44,574 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:47,827 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:11:47,827 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:11:48,192 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:11:48,193 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:11:48,193 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:11:48,193 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:11:48,736 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:11:50,277 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:11:50,744 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:11:55,296 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:00,315 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:02,829 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:12:02,830 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:12:05,964 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:10,565 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:12:11,570 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:16,590 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:17,832 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:12:17,832 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:12:18,272 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:12:18,273 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:12:18,273 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:12:18,274 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:12:18,853 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:12:20,861 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:12:22,358 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:27,377 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:32,395 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:32,837 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:12:32,837 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:12:37,992 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:40,570 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:12:43,579 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:47,839 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:12:47,840 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:12:48,338 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:12:48,339 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:12:48,339 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:12:48,340 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:12:48,958 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:12:49,407 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:50,967 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:12:54,420 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:12:59,437 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:02,842 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:13:02,843 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:13:04,989 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:10,008 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:10,573 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:13:15,592 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:17,847 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:13:17,848 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:13:18,405 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:13:18,406 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:13:18,407 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:13:18,408 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:13:19,060 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:13:21,070 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:13:21,488 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:26,507 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:31,524 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:32,851 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:13:32,851 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:13:37,007 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:40,576 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:13:42,583 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:47,599 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:47,855 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:13:47,855 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:13:48,475 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:13:50,211 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:13:50,211 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:13:50,212 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:13:51,197 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:13:53,207 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:13:53,225 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:13:58,243 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:02,856 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:14:02,856 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:14:04,035 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:09,054 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:10,576 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:14:14,593 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:17,861 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:14:17,861 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:14:18,541 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:14:18,542 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:14:18,542 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:14:18,543 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:14:19,320 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:14:19,608 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:21,330 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:14:24,627 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:29,646 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:32,864 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:14:32,864 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:14:35,022 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:40,042 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:40,579 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:14:45,597 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:47,869 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:14:47,870 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:14:48,606 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:14:48,607 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:14:48,607 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:14:48,608 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:14:49,437 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:14:50,677 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:14:51,442 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:14:55,696 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:00,716 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:02,873 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:15:02,874 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:15:06,046 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:10,580 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:15:11,583 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:16,604 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:17,875 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:15:17,876 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:15:18,673 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:15:18,674 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:15:18,674 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:15:18,675 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:15:19,542 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:15:21,558 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:15:21,749 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:26,767 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:31,787 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:32,879 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:15:32,879 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:15:37,034 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:40,584 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:15:42,593 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:47,613 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:47,882 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:15:47,882 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:15:48,739 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:15:48,740 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:15:48,740 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:15:48,741 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:15:49,678 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:15:51,686 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:15:52,809 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:15:57,826 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:02,845 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:02,885 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:16:02,886 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:16:08,041 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:10,589 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:16:13,603 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:17,889 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:16:17,889 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:16:18,797 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:16:18,798 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:16:18,798 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:16:18,798 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:18,799 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:16:18,803 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:16:20,811 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:16:23,869 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:28,887 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:32,890 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:16:32,890 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:16:34,049 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:39,068 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:40,592 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:16:44,603 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:47,893 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:16:47,894 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:16:48,861 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:16:48,861 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:16:48,861 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:16:48,862 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:16:48,920 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:16:49,934 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:50,928 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:16:54,957 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:16:59,971 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:02,895 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:17:02,895 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:17:05,048 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:10,062 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:10,593 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:17:15,613 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:17,898 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:17:17,898 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:17:18,932 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:17:18,933 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:17:18,933 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:17:18,933 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:17:19,039 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:17:21,006 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:21,047 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:17:26,028 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:31,045 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:32,898 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:17:32,899 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:17:36,065 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:40,597 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:17:41,600 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:46,612 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:47,901 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:17:47,901 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:17:49,002 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-25 13:17:49,004 DEBUG   SenderThread:49249 [sender.py:send():375] send: history
+2023-04-25 13:17:49,005 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: summary_record
+2023-04-25 13:17:49,006 INFO    SenderThread:49249 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-25 13:17:49,156 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/wandb-summary.json
+2023-04-25 13:17:51,166 INFO    Thread-12 :49249 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230425_131040-r0xpc55n/files/output.log
+2023-04-25 13:17:52,123 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:17:57,145 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:18:02,162 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:18:02,904 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-25 13:18:02,905 DEBUG   SenderThread:49249 [sender.py:send_request():402] send_request: stop_status
+2023-04-25 13:18:08,065 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report
+2023-04-25 13:18:10,604 DEBUG   SenderThread:49249 [sender.py:send():375] send: stats
+2023-04-25 13:18:13,616 DEBUG   HandlerThread:49249 [handler.py:handle_request():144] handle_request: status_report

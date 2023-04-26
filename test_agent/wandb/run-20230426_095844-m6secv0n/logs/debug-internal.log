@@ -1,0 +1,173 @@
+2023-04-26 09:58:45,176 INFO    StreamThr :61288 [internal.py:wandb_internal():86] W&B internal server running at pid: 61288, started at: 2023-04-26 09:58:45.175288
+2023-04-26 09:58:45,177 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: status
+2023-04-26 09:58:45,179 INFO    WriterThread:61288 [datastore.py:open_for_write():85] open: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/run-m6secv0n.wandb
+2023-04-26 09:58:45,179 DEBUG   SenderThread:61288 [sender.py:send():375] send: header
+2023-04-26 09:58:45,179 DEBUG   SenderThread:61288 [sender.py:send():375] send: run
+2023-04-26 09:58:45,551 INFO    SenderThread:61288 [dir_watcher.py:__init__():219] watching files in: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files
+2023-04-26 09:58:45,551 INFO    SenderThread:61288 [sender.py:_start_run_threads():1124] run started: m6secv0n with start time 1682495924.272028
+2023-04-26 09:58:45,552 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: summary_record
+2023-04-26 09:58:45,552 INFO    SenderThread:61288 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-26 09:58:45,556 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: check_version
+2023-04-26 09:58:45,556 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: check_version
+2023-04-26 09:58:45,622 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: run_start
+2023-04-26 09:58:45,623 DEBUG   HandlerThread:61288 [system_info.py:__init__():31] System info init
+2023-04-26 09:58:45,623 DEBUG   HandlerThread:61288 [system_info.py:__init__():46] System info init done
+2023-04-26 09:58:45,623 INFO    HandlerThread:61288 [system_monitor.py:start():181] Starting system monitor
+2023-04-26 09:58:45,624 INFO    SystemMonitor:61288 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-04-26 09:58:45,624 INFO    HandlerThread:61288 [system_monitor.py:probe():201] Collecting system info
+2023-04-26 09:58:45,624 DEBUG   HandlerThread:61288 [system_info.py:probe():195] Probing system
+2023-04-26 09:58:45,625 INFO    SystemMonitor:61288 [interfaces.py:start():190] Started cpu monitoring
+2023-04-26 09:58:45,625 INFO    SystemMonitor:61288 [interfaces.py:start():190] Started disk monitoring
+2023-04-26 09:58:45,625 INFO    SystemMonitor:61288 [interfaces.py:start():190] Started memory monitoring
+2023-04-26 09:58:45,626 INFO    SystemMonitor:61288 [interfaces.py:start():190] Started network monitoring
+2023-04-26 09:58:45,627 DEBUG   HandlerThread:61288 [system_info.py:_probe_git():180] Probing git
+2023-04-26 09:58:45,673 DEBUG   HandlerThread:61288 [system_info.py:_probe_git():188] Probing git done
+2023-04-26 09:58:45,674 DEBUG   HandlerThread:61288 [system_info.py:probe():240] Probing system done
+2023-04-26 09:58:45,674 DEBUG   HandlerThread:61288 [system_monitor.py:probe():210] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.9', 'heartbeatAt': '2023-04-26T07:58:45.624948', 'startedAt': '2023-04-26T07:58:44.263012', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py', 'codePath': 'main_test_agent.py', 'git': {'remote': 'https://github.com/Vettinari/InanceAlgo.git', 'commit': 'a15ad59f034b128cc154801105308586ec127875'}, 'email': 'milosz.bertman@gmail.com', 'root': '/Users/milosz/Documents/Pycharm/InanceAlgo', 'host': 'MacBook-Pro-van-SML-MD6T.local', 'username': 'milosz', 'executable': '/Users/milosz/opt/anaconda3/envs/Inance/bin/python', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 2300, 'min': 2300, 'max': 2300}, 'cpu_freq_per_core': [{'current': 2300, 'min': 2300, 'max': 2300}], 'disk': {'total': 891.2763442993164, 'used': 14.143569946289062}, 'memory': {'total': 32.0}}
+2023-04-26 09:58:45,674 INFO    HandlerThread:61288 [system_monitor.py:probe():211] Finished collecting system info
+2023-04-26 09:58:45,674 INFO    HandlerThread:61288 [system_monitor.py:probe():214] Publishing system info
+2023-04-26 09:58:45,674 DEBUG   HandlerThread:61288 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-04-26 09:58:45,675 DEBUG   HandlerThread:61288 [system_info.py:_save_pip():67] Saving pip packages done
+2023-04-26 09:58:45,675 DEBUG   HandlerThread:61288 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-04-26 09:58:46,560 INFO    Thread-853:61288 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-summary.json
+2023-04-26 09:58:46,560 INFO    Thread-853:61288 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/requirements.txt
+2023-04-26 09:58:46,560 INFO    Thread-853:61288 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/conda-environment.yaml
+2023-04-26 09:58:49,064 DEBUG   HandlerThread:61288 [system_info.py:_save_conda():86] Saving conda packages done
+2023-04-26 09:58:49,065 INFO    HandlerThread:61288 [system_monitor.py:probe():216] Finished publishing system info
+2023-04-26 09:58:49,066 DEBUG   SenderThread:61288 [sender.py:send():375] send: files
+2023-04-26 09:58:49,066 INFO    SenderThread:61288 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-04-26 09:58:49,073 DEBUG   SenderThread:61288 [sender.py:send():375] send: telemetry
+2023-04-26 09:58:49,074 DEBUG   SenderThread:61288 [sender.py:send():375] send: telemetry
+2023-04-26 09:58:49,075 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-26 09:58:49,075 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: stop_status
+2023-04-26 09:58:49,252 DEBUG   SenderThread:61288 [sender.py:send():375] send: config
+2023-04-26 09:58:49,564 INFO    Thread-853:61288 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/conda-environment.yaml
+2023-04-26 09:58:49,564 INFO    Thread-853:61288 [dir_watcher.py:_on_file_created():278] file/dir created: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-metadata.json
+2023-04-26 09:58:49,683 DEBUG   SenderThread:61288 [sender.py:send():375] send: telemetry
+2023-04-26 09:58:49,683 DEBUG   SenderThread:61288 [sender.py:send():375] send: exit
+2023-04-26 09:58:49,683 INFO    SenderThread:61288 [sender.py:send_exit():598] handling exit code: 0
+2023-04-26 09:58:49,684 INFO    SenderThread:61288 [sender.py:send_exit():600] handling runtime: 4
+2023-04-26 09:58:49,684 INFO    SenderThread:61288 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-26 09:58:49,684 INFO    SenderThread:61288 [sender.py:send_exit():606] send defer
+2023-04-26 09:58:49,685 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,685 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 0
+2023-04-26 09:58:49,685 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,685 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 0
+2023-04-26 09:58:49,686 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 1
+2023-04-26 09:58:49,686 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,686 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 1
+2023-04-26 09:58:49,686 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,686 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 1
+2023-04-26 09:58:49,686 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 2
+2023-04-26 09:58:49,686 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,686 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 2
+2023-04-26 09:58:49,687 INFO    HandlerThread:61288 [system_monitor.py:finish():190] Stopping system monitor
+2023-04-26 09:58:49,687 INFO    HandlerThread:61288 [interfaces.py:finish():202] Joined cpu monitor
+2023-04-26 09:58:49,687 DEBUG   SystemMonitor:61288 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-04-26 09:58:49,687 INFO    HandlerThread:61288 [interfaces.py:finish():202] Joined disk monitor
+2023-04-26 09:58:49,687 DEBUG   SystemMonitor:61288 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2023-04-26 09:58:49,687 INFO    HandlerThread:61288 [interfaces.py:finish():202] Joined memory monitor
+2023-04-26 09:58:49,687 DEBUG   SystemMonitor:61288 [system_monitor.py:_start():170] Publishing last batch of metrics
+2023-04-26 09:58:49,687 INFO    HandlerThread:61288 [interfaces.py:finish():202] Joined network monitor
+2023-04-26 09:58:49,688 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,688 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 2
+2023-04-26 09:58:49,688 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 3
+2023-04-26 09:58:49,688 DEBUG   SenderThread:61288 [sender.py:send():375] send: stats
+2023-04-26 09:58:49,688 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,689 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 3
+2023-04-26 09:58:49,689 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,689 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 3
+2023-04-26 09:58:49,689 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 4
+2023-04-26 09:58:49,689 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,689 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 4
+2023-04-26 09:58:49,689 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,689 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 4
+2023-04-26 09:58:49,689 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 5
+2023-04-26 09:58:49,690 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,690 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 5
+2023-04-26 09:58:49,690 DEBUG   SenderThread:61288 [sender.py:send():375] send: summary
+2023-04-26 09:58:49,690 INFO    SenderThread:61288 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-04-26 09:58:49,690 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,690 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 5
+2023-04-26 09:58:49,690 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 6
+2023-04-26 09:58:49,690 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,690 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 6
+2023-04-26 09:58:49,691 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,691 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 6
+2023-04-26 09:58:49,693 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: status_report
+2023-04-26 09:58:49,695 INFO    wandb-upload_0:61288 [upload_job.py:push():137] Uploaded file /var/folders/5j/x1mmgnwn0rx3_1zs9npqwwvr0000gp/T/tmpfrpsf0q2wandb/boo3cjfj-wandb-metadata.json
+2023-04-26 09:58:49,895 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 7
+2023-04-26 09:58:49,895 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,895 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 7
+2023-04-26 09:58:49,896 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,896 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 7
+2023-04-26 09:58:49,896 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 8
+2023-04-26 09:58:49,896 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,896 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 8
+2023-04-26 09:58:49,896 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:49,896 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 8
+2023-04-26 09:58:49,902 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 9
+2023-04-26 09:58:49,902 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:49,902 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 9
+2023-04-26 09:58:49,902 DEBUG   SenderThread:61288 [sender.py:send():375] send: artifact
+2023-04-26 09:58:50,565 INFO    Thread-853:61288 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-summary.json
+2023-04-26 09:58:50,584 INFO    Thread-853:61288 [dir_watcher.py:_on_file_modified():295] file/dir modified: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/config.yaml
+2023-04-26 09:58:50,688 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: poll_exit
+2023-04-26 09:58:50,857 INFO    SenderThread:61288 [sender.py:send_artifact():1474] sent artifact job-https___github.com_Vettinari_InanceAlgo.git_main_test_agent.py - {'id': 'QXJ0aWZhY3Q6NDMzNzAzNTg5', 'digest': 'a035287c7de27a5e0510102f0000343a', 'state': 'COMMITTED', 'aliases': [{'artifactCollectionName': 'job-https___github.com_Vettinari_InanceAlgo.git_main_test_agent.py', 'alias': 'latest'}, {'artifactCollectionName': 'job-https___github.com_Vettinari_InanceAlgo.git_main_test_agent.py', 'alias': 'v1'}], 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjY0NjE1NjQ0', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6NDMzNzAzNTg5', 'versionIndex': 1}}, 'version': 'v1'}
+2023-04-26 09:58:50,858 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:50,858 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 9
+2023-04-26 09:58:50,858 INFO    SenderThread:61288 [dir_watcher.py:finish():365] shutting down directory watcher
+2023-04-26 09:58:51,590 INFO    SenderThread:61288 [dir_watcher.py:finish():395] scan: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files
+2023-04-26 09:58:51,590 INFO    SenderThread:61288 [dir_watcher.py:finish():409] scan save: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/requirements.txt requirements.txt
+2023-04-26 09:58:51,591 INFO    SenderThread:61288 [dir_watcher.py:finish():409] scan save: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/config.yaml config.yaml
+2023-04-26 09:58:51,594 INFO    SenderThread:61288 [dir_watcher.py:finish():409] scan save: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-summary.json wandb-summary.json
+2023-04-26 09:58:51,594 INFO    SenderThread:61288 [dir_watcher.py:finish():409] scan save: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/conda-environment.yaml conda-environment.yaml
+2023-04-26 09:58:51,594 INFO    SenderThread:61288 [dir_watcher.py:finish():409] scan save: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-metadata.json wandb-metadata.json
+2023-04-26 09:58:51,594 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 10
+2023-04-26 09:58:51,594 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: poll_exit
+2023-04-26 09:58:51,595 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:51,595 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 10
+2023-04-26 09:58:51,601 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:51,602 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 10
+2023-04-26 09:58:51,602 INFO    SenderThread:61288 [file_pusher.py:finish():168] shutting down file pusher
+2023-04-26 09:58:51,691 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: poll_exit
+2023-04-26 09:58:51,692 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: poll_exit
+2023-04-26 09:58:52,121 INFO    wandb-upload_0:61288 [upload_job.py:push():137] Uploaded file /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/requirements.txt
+2023-04-26 09:58:52,125 INFO    wandb-upload_1:61288 [upload_job.py:push():137] Uploaded file /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/config.yaml
+2023-04-26 09:58:52,143 INFO    wandb-upload_2:61288 [upload_job.py:push():137] Uploaded file /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/wandb-summary.json
+2023-04-26 09:58:52,163 INFO    wandb-upload_3:61288 [upload_job.py:push():137] Uploaded file /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/files/conda-environment.yaml
+2023-04-26 09:58:52,366 INFO    Thread-852 (_thread_body):61288 [sender.py:transition_state():626] send defer: 11
+2023-04-26 09:58:52,366 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:52,366 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 11
+2023-04-26 09:58:52,367 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:52,367 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 11
+2023-04-26 09:58:52,367 INFO    SenderThread:61288 [file_pusher.py:join():173] waiting for file pusher
+2023-04-26 09:58:52,367 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 12
+2023-04-26 09:58:52,367 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:52,367 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 12
+2023-04-26 09:58:52,368 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:52,368 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 12
+2023-04-26 09:58:52,525 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 13
+2023-04-26 09:58:52,526 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:52,526 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 13
+2023-04-26 09:58:52,526 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:52,526 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 13
+2023-04-26 09:58:52,527 INFO    SenderThread:61288 [sender.py:transition_state():626] send defer: 14
+2023-04-26 09:58:52,527 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: defer
+2023-04-26 09:58:52,527 INFO    HandlerThread:61288 [handler.py:handle_request_defer():170] handle defer: 14
+2023-04-26 09:58:52,527 DEBUG   SenderThread:61288 [sender.py:send():375] send: final
+2023-04-26 09:58:52,528 DEBUG   SenderThread:61288 [sender.py:send():375] send: footer
+2023-04-26 09:58:52,528 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: defer
+2023-04-26 09:58:52,528 INFO    SenderThread:61288 [sender.py:send_request_defer():622] handle sender defer: 14
+2023-04-26 09:58:52,529 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: poll_exit
+2023-04-26 09:58:52,529 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: server_info
+2023-04-26 09:58:52,529 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: get_summary
+2023-04-26 09:58:52,530 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: sampled_history
+2023-04-26 09:58:52,530 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: poll_exit
+2023-04-26 09:58:52,530 DEBUG   SenderThread:61288 [sender.py:send_request():402] send_request: server_info
+2023-04-26 09:58:52,651 DEBUG   HandlerThread:61288 [handler.py:handle_request():144] handle_request: shutdown
+2023-04-26 09:58:52,652 INFO    HandlerThread:61288 [handler.py:finish():845] shutting down handler
+2023-04-26 09:58:53,533 INFO    WriterThread:61288 [datastore.py:close():298] close: /Users/milosz/Documents/Pycharm/InanceAlgo/test_agent/wandb/run-20230426_095844-m6secv0n/run-m6secv0n.wandb
+2023-04-26 09:58:53,652 INFO    SenderThread:61288 [sender.py:finish():1550] shutting down sender
+2023-04-26 09:58:53,653 INFO    SenderThread:61288 [file_pusher.py:finish():168] shutting down file pusher
+2023-04-26 09:58:53,653 INFO    SenderThread:61288 [file_pusher.py:join():173] waiting for file pusher

@@ -1,0 +1,17 @@
+250/1664 Score: -392.818 | Balance=9820.35$ | MaxBalance=12918.81$ | Positions=6
+{'ActionReward': -154.0,
+ 'DrawdownReward': 0.0,
+ 'IntermediateReward': -4.4154599999999995,
+ 'SharpeReward': -4.752958770371752,
+ 'TransactionReward': -229.65}
+500/1664 Score: -991.964 | Balance=9596.41$ | MaxBalance=12918.81$ | Positions=14
+{'ActionReward': -510.0,
+ 'DrawdownReward': -16.857323676253422,
+ 'IntermediateReward': -6.20569,
+ 'SharpeReward': -5.3112661244564485,
+ 'TransactionReward': -453.5899999999999}
+750/1664 Score: -869.78 | Balance=9805.28$ | MaxBalance=12918.81$ | Positions=23
+{'ActionReward': -462.0,
+ 'DrawdownReward': -51.39919836860978,
+ 'IntermediateReward': -5.92984,
+ 'SharpeReward': -5.731259540748898,

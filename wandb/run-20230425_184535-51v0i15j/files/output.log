@@ -1,0 +1,15 @@
+Risk manager:
+Initial balance: 10000
+Stop losses: [2]
+Risk/Reward ratios: [1.5]
+Trade risk: 100.0
+Action space: 4
+{0: Action(long, sl: 2, rr: 1.5),
+ 1: Action(short, sl: 2, rr: 1.5),
+ 2: Action(hold, sl: None, rr: None),
+ 3: Action(close, sl: None, rr: None)}
+None
+Choose action:
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_debug.py", line 56, in <module>
+    action = int(input("Choose action:"))

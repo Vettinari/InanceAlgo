@@ -4,7 +4,7 @@ import Utils
 import pandas as pd
 from DataProcessing.timeframe import OHLCT
 from positions import Position, Long, Short
-from reward_system import RewardBuffer
+from reward_buffer import RewardBuffer
 
 template_position = Long(ticker='EURUSD',
                          open_time='0',

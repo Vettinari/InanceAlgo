@@ -1,0 +1,8 @@
+{'previous_history': None, 'current_rewards': [<reward_buffer.ActionReward object at 0x7ff6992527d0>, <reward_buffer.ActionReward object at 0x7ff699252530>], 'rewards_history': Empty DataFrame
+Columns: [TransactionReward, ActionReward, IntermediateReward, SharpeReward, DrawdownReward]
+Index: []}
+Traceback (most recent call last):
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 88, in <module>
+    observation_, reward, _, done, info = env.step(action)
+  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 86, in step
+    time.sleep(30)

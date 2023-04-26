@@ -18,7 +18,8 @@ class TradeGym(gymnasium.Env):
                  risk_manager: RiskManager,
                  data_pipeline: DataPipeline,
                  reward_scaling: float,
-                 verbose: Optional[int] = None):
+                 verbose: Optional[int] = 200,
+                 wandb_logger: bool = False):
         self.state = None
         self.wallet_state = None
         self.data_state = None
@@ -47,16 +48,17 @@ class TradeGym(gymnasium.Env):
         self.data_pipeline: DataPipeline = data_pipeline
 
         self.max_steps = 0
+        self.verbose = verbose
         self.reset()
-        self.verbose = verbose or 200
 
         # Spaces
         self.action_space = spaces.Discrete(n=len(risk_manager.action_dict.values()), start=0)
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(len(self.state),))
 
-        self.connection = wandb.init(entity="miloszbertman", project=f'TradingGym')
-        self.wandb_config = self.connection.config
-        self.wandb_config.log_interval = verbose
+        self.wandb_logger = wandb_logger
+        if self.wandb_logger:
+            self.connection = wandb.init(entity="miloszbertman", project='TradingGym')
+            self.connection.config.log_interval = self.verbose
 
     def step(self, action) -> Tuple[np.array, float, bool, bool, dict]:
 
@@ -66,6 +68,7 @@ class TradeGym(gymnasium.Env):
             self.done = 1
 
         if self.done:
+            self.connection.finish()
             return self.state, self.reward, False, self.done, {}
 
         else:
@@ -79,12 +82,14 @@ class TradeGym(gymnasium.Env):
             # Update wallet and environment elements for state generation
             self.update_wallet_and_env()
 
-            log_dict = self.risk_manager.reward_buffer.get_log_info()
-            log_dict.update({'Score': round(sum(self.rewards), 3),
-                             'Balance': self.risk_manager.wallet.total_balance,
-                             'Positions': len(self.risk_manager.wallet.closed_positions)})
+            if self.wandb_logger:
+                log_dict = self.risk_manager.reward_buffer.get_log_info()
+                log_dict.update({'total_score': round(sum(self.rewards), 3),
+                                 'wallet_balance': self.risk_manager.wallet.total_balance,
+                                 'position_count': len(self.risk_manager.wallet.closed_positions)})
+                log_dict.update(self.risk_manager.yield_action_bin())
+                self.connection.log(log_dict)
 
-            self.connection.log(log_dict)
             self.reward = self.risk_manager.reward_buffer.yield_rewards()
             self.rewards.append(self.reward)
 
@@ -94,7 +99,7 @@ class TradeGym(gymnasium.Env):
                       f"Balance={self.risk_manager.wallet.total_balance}$ | "
                       f"MaxBalance={self.risk_manager.wallet.max_balance}$ | "
                       f"Positions={len(self.risk_manager.wallet.closed_positions)}")
-                pprint(self.risk_manager.reward_buffer.get_info())
+                pprint(self.risk_manager.reward_buffer.get_log_info())
                 print()
 
             return self.state, self.reward, False, self.done, {}
@@ -122,6 +127,10 @@ class TradeGym(gymnasium.Env):
         self.generate_state()
         self.max_steps = self.data_pipeline.dataframe.shape[0] - self.data_pipeline.current_step
         self.risk_manager.reward_buffer.reset(history=True)
+        self.risk_manager.action_history = {str(action): 0 for action in self.risk_manager.action_dict.values()}
+
+        self.connection = wandb.init(entity="miloszbertman", project='TradingGym')
+        self.connection.config.log_interval = self.verbose
 
         return self.state, {}
 

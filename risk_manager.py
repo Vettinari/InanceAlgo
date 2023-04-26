@@ -3,7 +3,7 @@ from pprint import pprint
 import pandas as pd
 
 from DataProcessing.timeframe import OHLCT
-from reward_system import ActionReward, TransactionReward, IntermediateReward, RewardBuffer
+from reward_buffer import ActionReward, TransactionReward, IntermediateReward, RewardBuffer
 from wallet import Wallet
 from typing import List, Optional, Union
 
@@ -16,6 +16,12 @@ class Action:
 
     def __repr__(self):
         return f"Action({self.action}, sl: {self.stop_loss}, rr: {self.risk_reward})"
+
+    def __str__(self):
+        return f"{self.action}_sl:{self.stop_loss}_rr:{self.risk_reward}"
+
+    def __float__(self):
+        return
 
 
 class RiskManager:
@@ -41,8 +47,18 @@ class RiskManager:
         self.action_dict = self._generate_action_space()
         self.stop_loss_type = stop_loss_type
         self.reward_buffer: RewardBuffer = reward_buffer
+        self.idle_time = 0
 
-        # self.action_history: pd.DataFrame = pd.DataFrame(columns=[], index=[])
+        self.action_history: dict = {str(action): 0 for action in self.action_dict.values()}
+        self.current_action_bin: dict = {str(action): 0 for action in self.action_dict.values()}
+
+    def reset_action_bin(self):
+        self.current_action_bin = {str(action): 0 for action in self.action_dict.values()}
+
+    def yield_action_bin(self):
+        out = self.current_action_bin
+        self.reset_action_bin()
+        return out
 
     def _generate_action_space(self, ) -> dict:
         actions = ['long', 'short', 'hold']
@@ -67,20 +83,24 @@ class RiskManager:
         flag = True
         position = self.wallet.position
 
-        if position and position.type == action or (not position and action == 'close'):
-            self.reward_buffer.reward_action(reward=-1.0)
+        if (position and position.type == action) or (position is None and action == 'close'):
+            self.reward_buffer.reward_action(reward=-100.0)
             flag = False
 
         if action == 'hold' and self.wallet.position is None:
-            self.reward_buffer.reward_action(reward=-0.05)
-            flag = False
+            self.reward_buffer.reward_action(reward=0 - 1 * self.idle_time)
+            self.idle_time += 1
 
         if flag:
-            self.reward_buffer.reward_action(reward=0.01)
+            self.reward_buffer.reward_action(reward=1)
+            self.idle_time = 0
+
         return flag
 
     def execute_action(self, action_index: int, current_atr: float):
         action = self.action_dict[action_index]
+        self.action_history[str(action)] += 1
+        self.current_action_bin[str(action)] = 1
 
         if self._validate_action(action=action.action):
             if action.action == "close":

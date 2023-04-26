@@ -1,0 +1,66 @@
+250/306963 Score: -891.894 | Balance=9216.61$ | MaxBalance=10585.77$ | Positions=118
+{'ActionReward': '-93.49000000000001 - Δ:0.0',
+ 'DrawdownReward': '-214.9505826010637 - Δ:0.0',
+ 'IntermediateReward': '1.9668100000000002 - Δ:0.0',
+ 'SharpeReward': '-0.3523975111863189 - Δ:0.0',
+ 'TransactionReward': '-649.41 - Δ:0.0'}
+500/306963 Score: -1275.629 | Balance=9225.98$ | MaxBalance=10585.77$ | Positions=236
+{'ActionReward': '-192.01000000000005 - Δ:-98.52',
+ 'DrawdownReward': '-507.2778441542331 - Δ:-292.327',
+ 'IntermediateReward': '3.39968 - Δ:1.433',
+ 'SharpeReward': '-4.043170371540445 - Δ:-3.691',
+ 'TransactionReward': '-640.0399999999998 - Δ:9.37'}
+750/306963 Score: -1197.6 | Balance=9706.93$ | MaxBalance=10585.77$ | Positions=350
+{'ActionReward': '-284.55 - Δ:-92.54',
+ 'DrawdownReward': '-816.8292721891273 - Δ:-309.551',
+ 'IntermediateReward': '5.20897 - Δ:1.809',
+ 'SharpeReward': '-6.681554680402324 - Δ:-2.638',
+ 'TransactionReward': '-159.09 - Δ:480.95'}
+1000/306963 Score: -1001.685 | Balance=10297.69$ | MaxBalance=10585.77$ | Positions=457
+{'ActionReward': '-390.1400000000001 - Δ:-105.59',
+ 'DrawdownReward': '-1104.3339241856447 - Δ:-287.505',
+ 'IntermediateReward': '8.72678 - Δ:3.518',
+ 'SharpeReward': '-6.483654357362372 - Δ:0.198',
+ 'TransactionReward': '470.2199999999998 - Δ:629.31'}
+1250/306963 Score: -3249.947 | Balance=8527.04$ | MaxBalance=10585.77$ | Positions=577
+{'ActionReward': '-486.70000000000005 - Δ:-96.56',
+ 'DrawdownReward': '-1481.0659179716017 - Δ:-376.732',
+ 'IntermediateReward': '6.457059999999999 - Δ:-2.27',
+ 'SharpeReward': '-8.534286648479668 - Δ:-2.051',
+ 'TransactionReward': '-1300.4299999999998 - Δ:-1770.65'}
+1500/306963 Score: -3326.762 | Balance=8722.31$ | MaxBalance=10585.77$ | Positions=708
+{'ActionReward': '-571.08 - Δ:-84.38',
+ 'DrawdownReward': '-1962.0275069911825 - Δ:-480.962',
+ 'IntermediateReward': '6.7084 - Δ:0.251',
+ 'SharpeReward': '-11.82990769304611 - Δ:-3.296',
+ 'TransactionReward': '-783.5499999999998 - Δ:516.88'}
+1750/306963 Score: -3722.39 | Balance=8631.27$ | MaxBalance=10585.77$ | Positions=807
+{'ActionReward': '-680.7700000000002 - Δ:-109.69',
+ 'DrawdownReward': '-2352.3478033532356 - Δ:-390.32',
+ 'IntermediateReward': '8.140999999999998 - Δ:1.433',
+ 'SharpeReward': '-13.839733804062172 - Δ:-2.01',
+ 'TransactionReward': '-747.6600000000005 - Δ:35.89'}
+2000/306963 Score: -3235.812 | Balance=9614.42$ | MaxBalance=10585.77$ | Positions=895
+{'ActionReward': '-816.6800000000002 - Δ:-135.91',
+ 'DrawdownReward': '-2709.7674219748787 - Δ:-357.42',
+ 'IntermediateReward': '10.47952 - Δ:2.339',
+ 'SharpeReward': '-15.40548890858232 - Δ:-1.566',
+ 'TransactionReward': '174.3199999999997 - Δ:921.98'}
+2250/306963 Score: -3738.726 | Balance=9474.37$ | MaxBalance=10585.77$ | Positions=993
+{'ActionReward': '-918.23 - Δ:-101.55',
+ 'DrawdownReward': '-3113.2929012585564 - Δ:-403.525',
+ 'IntermediateReward': '12.289729999999999 - Δ:1.81',
+ 'SharpeReward': '-16.57809334264023 - Δ:-1.173',
+ 'TransactionReward': '-44.01999999999953 - Δ:-218.34'}
+2500/306963 Score: -3721.553 | Balance=9939.92$ | MaxBalance=10585.77$ | Positions=1074
+{'ActionReward': '-1029.88 - Δ:-111.65',
+ 'DrawdownReward': '-3449.5641339949543 - Δ:-336.271',
+ 'IntermediateReward': '16.75789 - Δ:4.468',
+ 'SharpeReward': '-17.284849842823355 - Δ:-0.707',
+ 'TransactionReward': '443.8600000000001 - Δ:487.88'}
+2750/306963 Score: -4000.034 | Balance=10146.82$ | MaxBalance=10811.31$ | Positions=1160
+{'ActionReward': '-1156.7600000000002 - Δ:-126.88',
+ 'DrawdownReward': '-3811.055709186582 - Δ:-361.492',
+ 'IntermediateReward': '19.44786 - Δ:2.69',
+ 'SharpeReward': '-16.983873114669702 - Δ:0.301',
+ 'TransactionReward': '650.7600000000004 - Δ:206.9'}

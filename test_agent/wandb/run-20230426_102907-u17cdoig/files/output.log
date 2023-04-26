@@ -1,0 +1,53 @@
+10/1664 Score: -259.935 | Balance=10096.28$ | MaxBalance=10127.89$ | Positions=5
+{'ActionReward': -394.0,
+ 'DrawdownReward': -0.8723121432481038,
+ 'IntermediateReward': 0.1386,
+ 'SharpeReward': 38.519192125363524,
+ 'TransactionReward': 96.28}
+20/1664 Score: -472.946 | Balance=10128.53$ | MaxBalance=10205.52$ | Positions=11
+{'ActionReward': -687.0,
+ 'DrawdownReward': -4.664048186846538,
+ 'IntermediateReward': 0.4655,
+ 'SharpeReward': 39.570359295719186,
+ 'TransactionReward': 76.29999999999997}
+30/1664 Score: -702.037 | Balance=10095.91$ | MaxBalance=10205.52$ | Positions=16
+{'ActionReward': -879.0,
+ 'DrawdownReward': -9.529754687430424,
+ 'IntermediateReward': 0.37179000000000006,
+ 'SharpeReward': 40.05802699860901,
+ 'TransactionReward': 43.67999999999996}
+40/1664 Score: -1045.559 | Balance=10050.84$ | MaxBalance=10205.52$ | Positions=22
+{'ActionReward': -1172.0,
+ 'DrawdownReward': -15.368602488131085,
+ 'IntermediateReward': 0.26439000000000007,
+ 'SharpeReward': 40.55310547640544,
+ 'TransactionReward': -1.3900000000000432}
+50/1664 Score: -1240.673 | Balance=10153.94$ | MaxBalance=10205.52$ | Positions=28
+{'ActionReward': -1465.0,
+ 'DrawdownReward': -21.207450288831748,
+ 'IntermediateReward': 0.34076000000000006,
+ 'SharpeReward': 41.10073961776149,
+ 'TransactionReward': 101.70999999999992}
+60/1664 Score: -1608.155 | Balance=9984.42$ | MaxBalance=10205.52$ | Positions=34
+{'ActionReward': -1657.0,
+ 'DrawdownReward': -27.148964496694724,
+ 'IntermediateReward': 0.13952,
+ 'SharpeReward': 41.28174487777849,
+ 'TransactionReward': -67.81000000000002}
+70/1664 Score: -2140.719 | Balance=9951.77$ | MaxBalance=10205.52$ | Positions=38
+{'ActionReward': -2152.0,
+ 'DrawdownReward': -31.980902994164566,
+ 'IntermediateReward': 0.13885999999999998,
+ 'SharpeReward': 41.20104685547696,
+ 'TransactionReward': -100.46000000000002}
+80/1664 Score: -2396.466 | Balance=9896.69$ | MaxBalance=10205.52$ | Positions=44
+{'ActionReward': -2344.0,
+ 'DrawdownReward': -40.32763323939617,
+ 'IntermediateReward': 0.008169999999999983,
+ 'SharpeReward': 41.01075870424945,
+ 'TransactionReward': -155.54000000000002}
+90/1664 Score: -2991.774 | Balance=9803.96$ | MaxBalance=10205.52$ | Positions=48
+{'ActionReward': -2839.0,
+ 'DrawdownReward': -47.285836820556156,
+ 'IntermediateReward': -0.35711999999999994,
+ 'SharpeReward': 40.756072190107105,

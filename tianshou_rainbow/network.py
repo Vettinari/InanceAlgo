@@ -176,36 +176,3 @@ class Rainbow(DQN):
             logits = q
         probs = logits.softmax(dim=2)
         return probs, state
-
-
-class QRDQN(DQN):
-    """Reference: Distributional Reinforcement Learning with Quantile \
-    Regression.
-
-    For advanced usage (how to customize the network), please refer to
-    :ref:`build_the_network`.
-    """
-
-    def __init__(
-            self,
-            c: int,
-            h: int,
-            w: int,
-            action_shape: Sequence[int],
-            num_quantiles: int = 200,
-            device: Union[str, int, torch.device] = "cpu",
-    ) -> None:
-        self.action_num = np.prod(action_shape)
-        super().__init__(c, h, w, [self.action_num * num_quantiles], device)
-        self.num_quantiles = num_quantiles
-
-    def forward(
-            self,
-            obs: Union[np.ndarray, torch.Tensor],
-            state: Optional[Any] = None,
-            info: Dict[str, Any] = {},
-    ) -> Tuple[torch.Tensor, Any]:
-        r"""Mapping: x -> Z(x, \*)."""
-        obs, state = super().forward(obs)
-        obs = obs.view(-1, self.action_num, self.num_quantiles)
-        return obs, state

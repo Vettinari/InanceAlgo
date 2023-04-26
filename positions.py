@@ -102,8 +102,6 @@ class Position:
         self.order_number = None
         self.type = "Abstract"
         # TrendReward calculations
-        self.profit_history = []
-        self.market_history = []
         self.steps_count = 0
 
     def update_position(self, ohlct: OHLCT) -> None:
@@ -182,8 +180,6 @@ class Long(Position):
         self.type = 'long'
 
     def update_position(self, ohlct: OHLCT) -> None:
-        self.market_history.append(ohlct.close)
-        self.steps_count += 1
 
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
@@ -201,8 +197,6 @@ class Long(Position):
                 self.profit = self.position_gain
             else:
                 self.update_profit(current_price=ohlct.close)
-
-        self.profit_history.append(self.profit)
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.le)
@@ -236,8 +230,6 @@ class Short(Position):
         self.type = 'short'
 
     def update_position(self, ohlct: OHLCT) -> None:
-        self.market_history.append(ohlct.close)
-        self.steps_count += 1
 
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
@@ -255,8 +247,6 @@ class Short(Position):
                 self.profit = self.position_gain
             else:
                 self.update_profit(current_price=ohlct.close)
-
-        self.profit_history.append(self.profit)
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.ge)
