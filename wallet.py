@@ -314,9 +314,5 @@ class Wallet:
     def get_position_rewards(self):
         self.reward_buffer.add_reward(reward_name='position_drawdown',
                                       reward_value=self.position_drawdown_reward())
-        self.transaction_reward = self.position_transaction_reward()
-
-    def yield_rewards(self):
-        out = {'drawdown': round(self.drawdown_reward, 2),
-               'transaction': round(self.transaction_reward, 2)}
-        return out
+        self.reward_buffer.add_reward(reward_name='transaction_reward',
+                                      reward_value=self.position_transaction_reward())

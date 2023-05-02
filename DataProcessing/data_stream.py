@@ -41,6 +41,7 @@ class DataStream:
             self.dataframe = self.dataframe.iloc[-self.data_size:]
 
         self.processors: List[DataProcessor] = []
+        self.max_steps = None
         self.split_index = int(len(self.dataframe) * self.data_split) if self.data_split else len(self.dataframe)
 
     def _load_csv_data(self):
@@ -120,6 +121,11 @@ class DataStream:
     @staticmethod
     def load_datastream(path):
         return Utils.load_object(path=path, filename=None)
+
+    def max_steps(self, data_type='train'):
+        if data_type == 'train':
+            return len(self.data_processors[self.step_size].train_data.keys())
+        return len(self.data_processors[self.step_size].test_data.keys())
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: ' \

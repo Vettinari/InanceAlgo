@@ -11,6 +11,7 @@ from gymnasium import spaces
 from DataProcessing.data_stream import DataStream
 from old_DataProcessing.data_pipeline import DataPipeline
 from old_DataProcessing.timeframe import OHLCT, TimeFrame
+from reward_buffer import RewardBuffer
 from risk_manager import RiskManager, Action, ActionValidator
 
 
@@ -23,19 +24,22 @@ class TradeGym(gymnasium.Env):
                  reward_scaling: float,
                  verbose: Optional[int] = 250,
                  wandb_logger: bool = False,
+                 env_type: str = 'train',
                  test=False):
+        self.env_type = env_type
         self.test = test
+        # Total state
         self.state = None
+        # Separate states
         self.wallet_state = None
         self.data_state = None
         self.tech_state = None
         self.chart_state = None
-        self.timeframes: Dict[int, TimeFrame] = None
 
         self.done = False
         self.current_step = 0
-        self.current_ohlct: OHLCT = None
         self.current_date = None
+        self.current_ohlct: OHLCT = None
 
         # Rewards
         self.reward_scaling = reward_scaling
@@ -48,7 +52,7 @@ class TradeGym(gymnasium.Env):
         self.action_validator: ActionValidator = action_validator
         self.reward_buffer: RewardBuffer = reward_buffer
 
-        self.max_steps = 0
+        self.max_steps = self.data_stream.max_steps(data_type=self.env_type)
         self.verbose = verbose
 
         self.wandb_logger = wandb_logger
@@ -68,7 +72,6 @@ class TradeGym(gymnasium.Env):
             return self.state, -10.0, False, True, {}
 
         log_dict = {}
-        current_rewards = {}
         action_class = self.risk_manager.get_action_object(action_index=agent_action)
 
         # if action is valid create continue else return bad action reward and same state
@@ -100,12 +103,10 @@ class TradeGym(gymnasium.Env):
                       f"Balance={self.risk_manager.wallet.total_balance}$ | "
                       f"Positions={len(self.risk_manager.wallet.closed_positions)}")
 
-            current_rewards.update(self.risk_manager.wallet.yield_rewards())
-
-        current_rewards.update(self.action_validator.yield_rewards())
+        current_rewards = self.reward_buffer.yield_rewards()
 
         if self.test:
-            pprint(current_rewards)
+            pprint("REWARDS:", current_rewards)
             print()
 
         self.reward = sum([reward for reward in current_rewards.values()])
@@ -120,20 +121,38 @@ class TradeGym(gymnasium.Env):
 
         return self.state, self.reward, False, self.done, {}
 
-    def update_wallet_and_env(self):
-        pass
-
     def reset(self) -> tuple[ObsType, dict]:
+        self.reward_buffer.reset()
+        self.risk_manager.reset()
+
         self.done = False
-        self.rewards = []
         self.reward = 0
+        self.rewards = []
         self.current_step = 0
+
+        # Initialize data state
+        self.generate_data_state()
+        self.update_OHLCT()
+
+        # Initialize wallet state
+        self.risk_manager.wallet.reset(ohlct=self.current_ohlct)
+        self.wallet_state = self.risk_manager.wallet.state(include_balance=False)
 
         if self.wandb_logger:
             self.connection = wandb.init(entity="miloszbertman", project='TradingGym')
             self.connection.config.log_interval = self.verbose
 
         return self.state, {}
+
+    def update_OHLCT(self):
+        self.current_ohlct = OHLCT(self.data_state[self.data_stream.step_size].iloc[-1],
+                                   timeframe=self.data_stream.step_size)
+        if self.test:
+            print("OHLCT:", self.current_ohlct)
+
+    def generate_data_state(self):
+        key = self.env_type + f"_{self.current_step}"
+        self.data_state = self.data_stream[key]
 
     def __repr__(self):
         return f'<TradeGym:\n' \
