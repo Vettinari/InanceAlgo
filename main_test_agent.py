@@ -2,35 +2,42 @@ import gymnasium
 import numpy as np
 import torch as T
 
-from DataProcessing.data_pipeline import DataPipeline
+from DataProcessing.data_stream import DataStream
+from old_DataProcessing.data_pipeline import DataPipeline
 from env import TradeGym
 from reward_buffer import RewardBuffer
-from risk_manager import RiskManager
+from risk_manager import RiskManager, ActionValidator
 from test_agent.agent import Agent
 from test_agent.network_builder import NetworkBuilderDDDQN
+from wallet import Wallet
 
 ticker = 'EURUSD'
 device = 'cuda' if T.cuda.is_available() else 'cpu'
+
 reward_buffer = RewardBuffer()
-risk_manager = RiskManager(ticker=ticker,
-                           initial_balance=10000,
-                           atr_stop_loss_ratios=[2, 4],
-                           risk_reward_ratios=[1.5, 2, 3],
-                           position_closing=True,
-                           portfolio_risk=0.02,
-                           reward_buffer=reward_buffer)
+action_validator = ActionValidator(position_reversing=False,
+                                   position_closing=False,
+                                   action_penalty=-0.001,
+                                   reward_buffer=reward_buffer)
 
-data_pipeline = DataPipeline(ticker=ticker,
-                             intervals=[15, 60, 240],
-                             return_window=1,
-                             chart_window=100,
-                             test=False)
+wallet = Wallet(ticker=10000,
+                initial_balance=10000,
+                reward_buffer=reward_buffer)
 
-env = TradeGym(data_pipeline=data_pipeline,
+risk_manager = RiskManager(wallet=wallet,
+                           atr_stop_loss_ratios=[3],
+                           risk_reward_ratios=[1.5, 2],
+                           portfolio_risk=0.02)
+
+data_pipeline = DataStream.load_datastream(path='data_streams/15_60_240_data30000')
+
+env = TradeGym(data_stream=data_pipeline,
                risk_manager=risk_manager,
+               action_validator=action_validator,
                reward_scaling=0.99,
                verbose=250,
-               wandb_logger=True)
+               wandb_logger=True,
+               test=False)
 
 seed = 42
 np.random.seed(seed=seed)
@@ -62,8 +69,10 @@ if __name__ == '__main__':
                                        weight_init=True,
                                        learning_rate=learning_rate,
                                        n_actions=env.action_space.n,
-                                       optimizer='adam', loss='mse',
-                                       batch_norm=True, dropout=False)
+                                       optimizer='adam',
+                                       loss='mse',
+                                       batch_norm=True,
+                                       dropout=0.1)
 
     agent.Q_eval = NetworkBuilderDDDQN(input_shape=env.observation_space.shape,
                                        hidden_dims=hidden_dims,
@@ -71,8 +80,10 @@ if __name__ == '__main__':
                                        weight_init=True,
                                        learning_rate=learning_rate,
                                        n_actions=env.action_space.n,
-                                       optimizer='adam', loss='mse',
-                                       batch_norm=True, dropout=False)
+                                       optimizer='adam',
+                                       loss='mse',
+                                       batch_norm=True,
+                                       dropout=0.1)
 
     scores = []
     eps_history = []

@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 29, in <module>
-    env = TradeGym(data_pipeline=data_pipeline,
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 50, in __init__
-    self.reset()
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 130, in reset
-    self.connection.config.log_interval = self.verbose
-AttributeError: 'TradeGym' object has no attribute 'verbose'

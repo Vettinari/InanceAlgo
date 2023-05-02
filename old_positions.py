@@ -85,9 +85,8 @@ class Position:
         self.one_pip_size = XTB[ticker]['one_pip_size']
         self.leverage = XTB[ticker]['leverage']
         self.position_risk = position_risk
-        self.profit = 0
+        self.profit = 0.00001
         # Closed
-        self.current_close = 0
         self.close_time = None
         self.close_price = None
         # Flags
@@ -107,7 +106,17 @@ class Position:
         self.type = "Abstract"
         # Reward calculations
         self.steps_count = 0
-        self.profit_history: list = [-0.000001]
+        self.profit_history: list = []
+
+    def update_position(self, ohlct: OHLCT) -> None:
+        self.steps_count += 1
+        self.profit_history.append(self.profit if self.profit != 0 else 0.00001)
+
+    @property
+    def unrealized_profit(self):
+        if self.is_stop_profit is False and self.is_stop_loss is False and self.is_closed is False:
+            return self.profit
+        return 0
 
     def update_profit(self, current_price) -> None:
         pass
@@ -120,18 +129,22 @@ class Position:
         print(f'Open at: {self.open_time} - 1:{self.leverage} leverage.')
         print(f'Open price: {self.open_price}$ - Volume: {self.volume}')
         print(f'Stop loss: {self.stop_loss}$ - Stop profit: {self.stop_profit}$ - RR: {self.risk_reward_ratio}x')
-        print(f'Pips profit: {self.profit}$ - Position risk: {self.position_risk}$')
+        print(f'Unrealized profit: {self.unrealized_profit}$ - Position risk: {self.position_risk}$')
         print(f'Margin: {self.margin}$ - Contract value: {self.contract_value}$')
         Utils.printline(text="", size=60, line_char="-", blank=True, title=False, test=True)
 
     def get_profit(self) -> float:
-        return round(self.profit, 6)
+        return round(self.profit, 5)
 
     def set_order_number(self, new_number):
         self.order_number = new_number
 
     def get_order_number(self):
         return self.order_number
+
+    def set_open_price(self, new_price):
+        self.open_price = new_price
+        self.update_profit(current_price=new_price)
 
     def _stop_loss_hit(self, ohlct: OHLCT, comparator: Callable) -> bool:
         return any(
@@ -144,38 +157,11 @@ class Position:
         )
 
     @property
-    def reward_drawdown(self):
-        if len(self.profit_history) > 0:
-            cumulative_returns = np.cumsum(self.profit_history)
-            cumulative_max = np.maximum.accumulate(cumulative_returns)
-            drawdowns = (cumulative_max - cumulative_returns) / cumulative_max
-            max_drawdown = -np.max(drawdowns)
-
-            if max_drawdown == np.nan:
-                return 0
-            else:
-                return max_drawdown
-        else:
-            return 0
-
-    @property
-    def reward_transaction(self):
-        if self.is_closed:
-            if self.is_stop_profit:
-                return 1.5 * self.profit
-            else:
-                return self.profit
-        else:
-            return 0
-
-    @property
-    def rewards(self):
-        return {'drawdown': self.reward_drawdown,
-                'transaction': self.reward_transaction}
-
-    def update_position(self, ohlct: OHLCT):
-        self.steps_count += 1
-        self.profit_history.append(self.profit)
+    def state(self) -> List[float]:
+        """
+        :return: [stop_loss_level, stop_profit level, unrealized_profit]
+        """
+        return [self.stop_loss, self.stop_profit, self.unrealized_profit]
 
     def __repr__(self):
         return f"<{self.type.capitalize()} Position: open_price={self.open_price}, " \
@@ -202,7 +188,6 @@ class Long(Position):
         self.type = 'long'
 
     def update_position(self, ohlct: OHLCT) -> None:
-        self.current_close = ohlct.close
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
             self.is_closed = True
@@ -219,9 +204,7 @@ class Long(Position):
                 self.profit = self.position_gain
             else:
                 self.update_profit(current_price=ohlct.close)
-
-        self.steps_count += 1
-        self.profit_history.append(self.profit)
+        super().update_position(ohlct=ohlct)
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.le)
@@ -230,13 +213,10 @@ class Long(Position):
         return super()._stop_profit_hit(ohlct, operator.ge)
 
     def update_profit(self, current_price) -> None:
-        self.profit = (current_price - self.open_price) / self.one_pip_size
-
-    def get_real_profit(self) -> float:
-        eur_usd_pip_value = 1 / self.close_price
+        eur_usd_pip_value = 1 / current_price
         pip_trade_value = XTB["EURUSD"]['one_lot_value'] * self.volume * self.one_pip_size * eur_usd_pip_value
-        pips = (self.close_price - self.open_price) / self.one_pip_size
-        return round(pips * pip_trade_value, 2)
+        pips = (current_price - self.open_price) / self.one_pip_size
+        self.profit = round(pips * pip_trade_value, 2)
 
 
 class Short(Position):
@@ -284,10 +264,7 @@ class Short(Position):
         return super()._stop_profit_hit(ohlct, operator.le)
 
     def update_profit(self, current_price) -> None:
-        self.profit = (self.open_price - current_price) / self.one_pip_size
-
-    def get_real_profit(self) -> float:
-        eur_usd_pip_value = 1 / self.close_price
+        eur_usd_pip_value = 1 / current_price
         pip_trade_value = XTB["EURUSD"]['one_lot_value'] * self.volume * self.one_pip_size * eur_usd_pip_value
-        pips = (self.open_price - self.close_price) / self.one_pip_size
-        return round(pips * pip_trade_value, 2)
+        pips = (self.open_price - current_price) / self.one_pip_size
+        self.profit = round(pips * pip_trade_value, 2)

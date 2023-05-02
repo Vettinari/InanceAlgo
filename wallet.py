@@ -1,8 +1,10 @@
 from pprint import pprint
+from typing import Union
 
+import numpy as np
 import Utils
 import pandas as pd
-from DataProcessing.timeframe import OHLCT
+from old_DataProcessing.timeframe import OHLCT
 from positions import Position, Long, Short
 from reward_buffer import RewardBuffer
 
@@ -22,16 +24,20 @@ class Wallet:
                  ticker: str,
                  initial_balance: float,
                  reward_buffer: RewardBuffer):
+        self.reward_buffer = reward_buffer
+        self._position_rewards = {'drawdown': 0,
+                                  'transaction': 0}
         self.max_balance = initial_balance
         self.ticker = ticker.upper()
         self.initial_balance = initial_balance
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
-        self.position: Position = None
+        self.position: Union[Short, Long] = None
         self.current_ohlct: OHLCT = None
         self.game_over: bool = False
         self.closed_positions = []
         self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
-        self.reward_buffer: RewardBuffer = reward_buffer
+        self.drawdown_reward = 0
+        self.transaction_reward = 0
         self.total_trades = 0
 
     def reserve_margin(self, amount):
@@ -71,18 +77,11 @@ class Wallet:
         self.position.is_closed = True
         self.position.close_price = self.current_ohlct.close
         self.position.close_time = self.current_ohlct.time
-        self.margin_balance['free'] += self.position.profit
+        self.margin_balance['free'] += self.position.get_real_profit()
         self.free_margin()
         self.__update_dataframe(position=self.position)
-        self.generate_rewards()
+        self.get_position_rewards()
         self.position = None
-
-    def generate_rewards(self):
-        if self.total_balance > self.max_balance:
-            self.max_balance = self.total_balance
-        self.reward_buffer.reward_transaction(position=self.position)
-        self.reward_buffer.reward_sharpe(returns=self.returns)
-        self.reward_buffer.reward_drawdown(returns=self.returns)
 
     def update_wallet(self, ohlct: OHLCT):
         self.is_game_over()
@@ -93,78 +92,62 @@ class Wallet:
     def update_position(self):
         if self.position is not None:
             self.position.update_position(ohlct=self.current_ohlct)
-            self.reward_buffer.reward_intermediate(position=self.position)
 
     @property
     def returns(self):
-        return self.history_dataframe.profit.values
+        self.history_dataframe[
+            'total_balance'] = self.history_dataframe.profit.cumsum() + 10000 - self.history_dataframe.profit
+        self.history_dataframe['returns'] = round(self.history_dataframe.profit / self.history_dataframe.total_balance,
+                                                  4)
+        return self.history_dataframe.returns.values
 
     def check_and_close_position(self):
-        if self.position is not None and self.position.is_closed:
+        if self.position and self.position.is_closed:
             self.margin_balance['free'] += self.position.profit
             self.free_margin()
             self.__update_dataframe(position=self.position)
-            self.generate_rewards()
+            self.get_position_rewards()
             self.position = None
 
     @property
-    def state(self, include_balance=True) -> list:
-        """
-        returns [balance, position_type, position_state] if include balance=True
-        position_type
-        :param include_balance:
-        :return list:
-        """
-        balance = self.total_balance / (self.initial_balance * 10)
+    def rewards(self):
+        out = self._position_rewards
+        self._position_rewards = {key: 0 for key in self._position_rewards.keys()}
+        return out
 
-        position_type = 0
-        if self.position and self.position.type == 'long':
-            position_type = 1
-        elif self.position and self.position.type == 'short':
-            position_type = -1
-
-        position_state = self.position.state if self.position is not None else [0, 0, 0]
+    def state(self, include_balance=False) -> list:
+        long_position = 1 if self.position and self.position.type == 'long' else 0
+        short_position = 1 if self.position and self.position.type == 'short' else 0
+        position_profit = self.position.get_profit() if self.position else 0
 
         if include_balance:
-            return [balance, position_type, *position_state]
+            return [self.total_balance / 100000, short_position, long_position, position_profit]
         else:
-            return [*position_type, *position_state]
-
-    @property
-    def cash(self) -> float:
-        return self.margin_balance['free']
+            return [short_position, long_position, position_profit]
 
     @property
     def total_balance(self) -> float:
         return self.margin_balance['free'] + self.margin_balance['margin']
 
-    @property
-    def unrealized_profit(self):
-        if self.position is None:
-            return 0
-        else:
-            return self.position.unrealized_profit
-
     def info(self) -> None:
-        if not self.game_over:
-            Utils.printline(text='Wallet info', title=False, line_char=":", size=60)
-            print(
-                f"Free: {self.margin_balance['free']}$ "
-                f"| Margin: {self.margin_balance['margin']}$ "
-                f"| Total: {self.total_balance}$")
-            if self.position:
-                self.position.info()
-                Utils.printline(text='', title=False, line_char=":", size=60, blank=True)
-            else:
-                Utils.printline(text='No opened positions', title=False, line_char=":", size=60)
+        Utils.printline(text='Wallet info', title=False, line_char=":", size=60)
+        print(
+            f"Free: {self.margin_balance['free']}$ "
+            f"| Margin: {self.margin_balance['margin']}$ "
+            f"| Total: {self.total_balance}$")
+        if self.position:
+            self.position.info()
+            Utils.printline(text='', title=False, line_char=":", size=60, blank=True)
         else:
-            Utils.printline(text='GAME OVER', title=True, line_char="=")
+            Utils.printline(text='No opened positions', title=False, line_char=":", size=60)
 
     def reset(self, ohlct: OHLCT):
         self.position = None
         self.game_over = False
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
         self.update_wallet(ohlct=ohlct)
+        self.drawdown_reward = 0
+        self.transaction_reward = 0
         self.total_trades = 0
         self.closed_positions = []
         self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
@@ -196,8 +179,144 @@ class Wallet:
         self.total_trades += 1
 
     def __repr__(self):
-        return f"<Wallet: margin_balance={self.margin_balance}>"
+        return f"<Wallet: margin_balance={self.margin_balance} position_profit={self.position.get_profit() if self.position else None}>"
+
+    def evaluation(self, returns):
+        return {
+            'wallet_sharpe_ratio': self.sharpe_ratio(returns=returns),
+            'wallet_sortino_ratio': self.sortino_ratio(returns=returns),
+            'wallet_maximum_drawdown': self.maximum_drawdown(returns=returns),
+            'wallet_profit_factor': self.profit_factor(returns=returns),
+            'wallet_average_trade_return': self.average_trade_return(returns=returns),
+            'wallet_win_rate': self.win_rate(returns=returns)
+        }
 
     def is_game_over(self):
-        if self.total_balance < self.initial_balance / 10:
+        if self.total_balance < 2000:
             self.game_over = True
+
+    @staticmethod
+    def sharpe_ratio(returns, risk_free_rate=0.01):
+        """
+        Calculate Sharpe ratio for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+        - risk_free_rate (float): The risk-free rate of return.
+
+        Returns:
+        - sharpe (float): The Sharpe ratio of the trading strategy.
+        """
+        excess_returns = returns - risk_free_rate
+        sharpe = np.mean(excess_returns) / np.std(excess_returns)
+        return sharpe
+
+    @staticmethod
+    def sortino_ratio(returns, risk_free_rate=0.01, mar=0.02):
+        """
+        Calculate Sortino ratio for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+        - risk_free_rate (float): The risk-free rate of return.
+        - mar (float): The minimum acceptable return.
+
+        Returns:
+        - sortino (float): The Sortino ratio of the trading strategy.
+        """
+        downside_returns = np.minimum(returns - mar, 0)
+        downside_volatility = np.std(downside_returns)
+        sortino = (np.mean(returns) - risk_free_rate) / downside_volatility
+        return sortino
+
+    @staticmethod
+    def maximum_drawdown(returns):
+        """
+        Calculate maximum drawdown for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+
+        Returns:
+        - mdd (float): The maximum drawdown of the trading strategy.
+        """
+        cum_returns = np.cumprod(1 + returns)
+        max_drawdown = np.maximum.accumulate(cum_returns) - cum_returns
+        mdd = np.max(max_drawdown)
+        return -mdd
+
+    @staticmethod
+    def profit_factor(returns):
+        """
+        Calculate profit factor for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+
+        Returns:
+        - pf (float): The profit factor of the trading strategy.
+        """
+        profit = np.sum(returns[returns > 0])
+        loss = np.sum(returns[returns < 0])
+        pf = profit / -loss
+        return pf
+
+    @staticmethod
+    def average_trade_return(returns):
+        """
+        Calculate average trade return for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+
+        Returns:
+        - atr (float): The average trade return of the trading strategy.
+        """
+        atr = np.mean(returns)
+        return atr
+
+    @staticmethod
+    def win_rate(returns):
+        """
+        Calculate win rate for a trading strategy.
+
+        Parameters:
+        - returns (numpy array): Array of returns for the trading strategy.
+
+        Returns:
+        - wr (float): The win rate of the trading strategy.
+        """
+        wins = np.sum(returns > 0)
+        total_trades = len(returns)
+        wr = wins / total_trades
+        return wr
+
+    def position_drawdown_reward(self):
+        cumulative_returns = np.cumsum(self.position.profit_history)
+        cumulative_max = np.maximum.accumulate(cumulative_returns)
+        drawdowns = (cumulative_max - cumulative_returns) / cumulative_max
+        max_drawdown = -np.max(drawdowns)
+
+        if max_drawdown == np.nan:
+            return 0
+        else:
+            return max_drawdown
+
+    def position_transaction_reward(self):
+        if self.position and self.position.is_closed:
+            if self.position.is_stop_profit:
+                return 1.5 * self.position.profit
+            else:
+                return self.position.profit
+        else:
+            return 0
+
+    def get_position_rewards(self):
+        self.reward_buffer.add_reward(reward_name='position_drawdown',
+                                      reward_value=self.position_drawdown_reward())
+        self.transaction_reward = self.position_transaction_reward()
+
+    def yield_rewards(self):
+        out = {'drawdown': round(self.drawdown_reward, 2),
+               'transaction': round(self.transaction_reward, 2)}
+        return out

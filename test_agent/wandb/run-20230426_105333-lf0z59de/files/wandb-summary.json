@@ -1,1 +1,0 @@
-{"TransactionReward": 478.38000000000005, "ActionReward": -5491.0, "IntermediateReward": 1.07676, "SharpeReward": 7.910721565969363, "DrawdownReward": -75.62770831271868, "total_score": -4912.804, "wallet_balance": 10545.67, "position_count": 98, "_timestamp": 1682499252.6771882, "_runtime": 39.5616340637207, "_step": 367, "_wandb": {"runtime": 38}}

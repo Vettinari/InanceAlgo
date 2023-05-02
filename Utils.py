@@ -4,6 +4,13 @@ import time
 import shutil
 import pickle
 import zipfile
+from typing import Callable, Optional
+
+import gc
+import gzip
+import os
+from pathlib import Path
+
 import requests
 import datetime
 import traceback
@@ -11,6 +18,9 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from multiprocessing import Pool
+
+from tqdm.auto import tqdm
 
 
 def make_path(directory):
@@ -41,7 +51,7 @@ def string_to_datetime(date_string, include_time=True):
 
 
 def concurrent_execution(function, args):
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         executor.map(function, args)
 
 
@@ -51,7 +61,7 @@ def concurrent_execution_with_return(function, args):
 
 
 def multiprocess_execution(function, args):
-    with ProcessPoolExecutor(max_workers=6) as executor:
+    with ProcessPoolExecutor(max_workers=3) as executor:
         executor.map(function, args)
 
 
@@ -83,21 +93,47 @@ def save_object(object_to_save, path: str, filename: str):
         pickle.dump(object_to_save, class_dump)
 
 
-def save_agent_config(agent, path, filename):
-    save_object(agent.config, path=path, filename=f'{filename}.agent_config')
+def load_object(path, filename):
+    # Create a variable to hold the contents of the object
+    object_contents = b""
 
+    if filename is None:
+        obj = [obj for obj in os.listdir(path) if not obj.startswith(".")]
+        filename = obj[0]
 
-def load_agent_config(path, filename):
-    return load_object(path=path, filename=filename)
+    # Set the chunk size to read from the file
+    chunk_size = 1024 * 1024 * 500
 
+    # Open the object using tqdm to display a progress bar
+    with tqdm(total=os.path.getsize(os.path.join(path, filename)), unit="B", unit_scale=True, desc=filename) as pbar:
+        # Open the file in binary mode
+        with open(os.path.join(path, filename), "rb") as f:
+            # Define a function to read a chunk of data from the file
+            def read_chunk(start):
+                f.seek(start)
+                chunk = f.read(chunk_size)
+                return chunk
 
-def load_object(path: str, filename: str):
-    full_path = f'{path}/{filename}'
-    with open(full_path, 'rb') as class_read:
-        loaded_class = pickle.load(class_read)
-        return loaded_class
+            # Get the size of the file
+            file_size = os.path.getsize(os.path.join(path, filename))
 
-    # noinspection PyBroadException
+            # Create a thread pool with 8 threads
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                # Create a list of start positions for each chunk
+                starts = list(range(0, file_size, chunk_size))
+
+                # Submit each chunk to the thread pool for reading
+                futures = [pool.submit(read_chunk, start) for start in starts]
+
+                # Iterate over the completed chunks and append them to the object contents
+                for future in futures:
+                    chunk = future.result()
+                    object_contents += chunk
+                    pbar.update(len(chunk))
+
+    # Return the object contents
+    pickle_object = pickle.loads(object_contents)
+    return pickle_object
 
 
 def find_exception_in_function(function, args):
@@ -120,12 +156,10 @@ def time_function(function, args):
         print(f'{function.__name__} function took: {end} seconds | {round(end / 60, 2)} mins')
 
 
-def send_telegram(message=None):
-    API_KEY = "5427420985:AAGZPcSBQXkzV42pLP9zz5cVWgF6TyHc50Y"
-    chat_id = "5099584727"
-    message = "PyCharm has finished running!" if message is None else message
-    url = f"https://api.telegram.org/bot{API_KEY}/sendMessage?chat_id={chat_id}&text={message}"
-    requests.get(url).json()
+# def send_telegram(message=None):
+#     message = "PyCharm has finished running!" if message is None else message
+#     url = f"https://api.telegram.org/bot{API_KEY}/sendMessage?chat_id={chat_id}&text={message}"
+#     requests.get(url).json()
 
 
 def printline(text, size=60, line_char="=", blank=False, title=False, test=True):
@@ -232,3 +266,8 @@ def load_configs_from_dir(load_dir: str):
             agent_config = load_agent_config(path=load_dir, filename=filename)
     return processor_config, agent_config
 
+
+def timeit(func: Callable):
+    now = datetime.now()
+    func()
+    print(f"This task took {datetime.now() - now}")

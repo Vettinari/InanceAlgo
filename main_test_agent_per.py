@@ -2,7 +2,7 @@ import gymnasium
 import numpy as np
 import torch as T
 
-from DataProcessing.data_pipeline import DataPipeline
+from old_DataProcessing.data_pipeline import DataPipeline
 from env import TradeGym
 from reward_system import RewardBuffer
 from risk_manager import RiskManager
@@ -17,7 +17,7 @@ risk_manager = RiskManager(ticker=ticker,
                            initial_balance=10000,
                            atr_stop_loss_ratios=[2],
                            risk_reward_ratios=[1.5, 2, 3],
-                           position_closing=True,
+                           manual_position_closing=True,
                            portfolio_risk=0.02,
                            reward_buffer=reward_buffer)
 

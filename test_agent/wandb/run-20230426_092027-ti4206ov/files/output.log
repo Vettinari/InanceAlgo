@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 88, in <module>
-    observation_, reward, _, done, info = env.step(action)
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 85, in step
-    print(self.risk_manager.reward_buffer.state)
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/reward_buffer.py", line 179, in state
-    return self.__dict__['rewards']
-KeyError: 'rewards'

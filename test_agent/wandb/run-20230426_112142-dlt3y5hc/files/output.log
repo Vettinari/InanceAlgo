@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/main_test_agent.py", line 88, in <module>
-    observation_, reward, _, done, info = env.step(action)
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/env.py", line 76, in step
-    self.risk_manager.execute_action(action_index=int(action),
-  File "/Users/milosz/Documents/Pycharm/InanceAlgo/risk_manager.py", line 106, in execute_action
-    self.current_sentiment[action.action] = 1 * action.risk_reward
-TypeError: unsupported operand type(s) for *: 'int' and 'NoneType'
