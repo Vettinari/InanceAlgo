@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 from datetime import timedelta
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, Optional
 
-from old_DataProcessing.timeframe import TimeFrame, OHLCT
+from DataProcessing.timeframe import TimeFrame, OHLCT
 
 
 class DataPipeline:

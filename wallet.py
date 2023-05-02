@@ -1,10 +1,9 @@
-from pprint import pprint
 from typing import Union
 
 import numpy as np
 import Utils
 import pandas as pd
-from old_DataProcessing.timeframe import OHLCT
+from DataProcessing.ohlct import OHLCT
 from positions import Position, Long, Short
 from reward_buffer import RewardBuffer
 
@@ -109,12 +108,6 @@ class Wallet:
             self.get_position_rewards()
             self.position = None
 
-    @property
-    def rewards(self):
-        out = self._position_rewards
-        self._position_rewards = {key: 0 for key in self._position_rewards.keys()}
-        return out
-
     def state(self, include_balance=False) -> list:
         long_position = 1 if self.position and self.position.type == 'long' else 0
         short_position = 1 if self.position and self.position.type == 'short' else 0
@@ -129,17 +122,20 @@ class Wallet:
     def total_balance(self) -> float:
         return self.margin_balance['free'] + self.margin_balance['margin']
 
-    def info(self) -> None:
-        Utils.printline(text='Wallet info', title=False, line_char=":", size=60)
-        print(
-            f"Free: {self.margin_balance['free']}$ "
-            f"| Margin: {self.margin_balance['margin']}$ "
-            f"| Total: {self.total_balance}$")
-        if self.position:
-            self.position.info()
-            Utils.printline(text='', title=False, line_char=":", size=60, blank=True)
+    def info(self, short=False) -> None:
+        if short:
+            print(self.__repr__())
         else:
-            Utils.printline(text='No opened positions', title=False, line_char=":", size=60)
+            Utils.printline(text='Wallet info', title=False, line_char=":", size=60)
+            print(
+                f"Free: {self.margin_balance['free']}$ "
+                f"| Margin: {self.margin_balance['margin']}$ "
+                f"| Total: {self.total_balance}$")
+            if self.position:
+                self.position.info()
+                Utils.printline(text='', title=False, line_char=":", size=60, blank=True)
+            else:
+                Utils.printline(text='No opened positions', title=False, line_char=":", size=60)
 
     def reset(self, ohlct: OHLCT):
         self.position = None
@@ -181,7 +177,12 @@ class Wallet:
     def __repr__(self):
         return f"<Wallet: margin_balance={self.margin_balance} position_profit={self.position.get_profit() if self.position else None}>"
 
-    def evaluation(self, returns):
+    def evaluation(self, returns) -> dict:
+        """
+        Evaluate wallet performance
+        :param returns: portfolio returns
+        :return: dict with evaluation metrics
+        """
         return {
             'wallet_sharpe_ratio': self.sharpe_ratio(returns=returns),
             'wallet_sortino_ratio': self.sortino_ratio(returns=returns),
@@ -190,6 +191,18 @@ class Wallet:
             'wallet_average_trade_return': self.average_trade_return(returns=returns),
             'wallet_win_rate': self.win_rate(returns=returns)
         }
+
+    def log_info(self, returns) -> dict:
+        """
+        Log wallet info and evaluation metrics
+        :param returns: portfolio returns
+        :return: dict with evaluation metrics and wallet
+        info that consists of total balance and total trades
+        """
+        out = self.evaluation(returns)
+        out.update({"wallet_balance": self.total_balance,
+                    "wallet_total_trades": self.total_trades})
+        return out
 
     def is_game_over(self):
         if self.total_balance < 2000:
@@ -304,15 +317,12 @@ class Wallet:
 
     def position_transaction_reward(self):
         if self.position and self.position.is_closed:
-            if self.position.is_stop_profit:
-                return 1.5 * self.position.profit
-            else:
-                return self.position.profit
+            return self.position.profit
         else:
             return 0
 
     def get_position_rewards(self):
-        self.reward_buffer.add_reward(reward_name='position_drawdown',
+        self.reward_buffer.add_reward(reward_name='drawdown',
                                       reward_value=self.position_drawdown_reward())
-        self.reward_buffer.add_reward(reward_name='transaction_reward',
+        self.reward_buffer.add_reward(reward_name='transaction',
                                       reward_value=self.position_transaction_reward())

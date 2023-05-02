@@ -1,12 +1,15 @@
 from pprint import pprint
 
+import numpy as np
 import pandas as pd
+import pandas_ta as ta
 
-from old_DataProcessing.timeframe import OHLCT
+import positions
+from DataProcessing.ohlct import OHLCT
 from positions import Position
 from reward_buffer import RewardBuffer
 from wallet import Wallet
-from typing import List, Optional, Union
+from typing import List, Optional
 
 
 class Action:
@@ -85,22 +88,31 @@ class RiskManager:
     def __init__(
             self,
             wallet: Wallet,
-            atr_stop_loss_ratios: Optional[List[float]] = None,
+            reward_buffer: RewardBuffer,
+            use_atr: bool = True,
+            stop_loss_ratios: Optional[List[float]] = None,
             risk_reward_ratios: Optional[List[int]] = None,
             portfolio_risk: Optional[float] = None,
+            base_pip_loss: Optional[float] = None
     ):
-        self.wallet = wallet
-        self.initial_balance = wallet.initial_balance
-        self.atr_stop_loss_ratios = atr_stop_loss_ratios or [2, 3]
-        self.risk_reward_ratios = risk_reward_ratios or [1.5, 2, 3]
-        self.trade_risk = self.initial_balance * (portfolio_risk or 0.02)
-        self.action_dict = self._generate_action_space()
+        self.wallet: Wallet = wallet
+        self.use_atr: bool = use_atr
+        self.base_pip_loss: Optional[float] = (base_pip_loss or 15)
+        self.initial_balance: float = wallet.initial_balance
+        self.atr_stop_loss_ratios: list = stop_loss_ratios or [2]
+        self.risk_reward_ratios: list = risk_reward_ratios or [2]
+        self.trade_risk: float = self.initial_balance * (portfolio_risk or 0.02)
+        self.action_dict: dict = self._generate_action_space()
         self._action_history: dict = {str(action): 0 for action in self.action_dict.values()}
         self._current_sentiment: float = 0
+        self.ohlc_buffer = pd.DataFrame(columns=['Datetime', 'open', 'high', 'low', 'close', 'volume'], index=[])
+        self.reward_buffer = reward_buffer
+        self.reward_buffer.set_trade_risk(self.trade_risk)
 
-    def reset(self):
+    def reset(self, dataframe: pd.DataFrame):
         self._current_sentiment = 0
         self._action_history: dict = {str(action): 0 for action in self.action_dict.values()}
+        self.ohlc_buffer = dataframe
 
     @property
     def sentiment(self):
@@ -132,7 +144,12 @@ class RiskManager:
     def get_action_object(self, action_index) -> Action:
         return self.action_dict[action_index]
 
-    def execute_action(self, action: Action, current_atr: float):
+    def execute_action(self, action: Action):
+        if self.use_atr:
+            current_atr = self.get_atr()
+        else:
+            current_atr = self.base_pip_loss * positions.XTB[self.wallet.ticker]['one_pip_size']
+
         # Update action history
         self._action_history[str(action)] += 1
         # Update current_sentiment
@@ -140,11 +157,13 @@ class RiskManager:
 
         if action.action == "close":
             self.wallet.position_close()
+
         elif action.action == "long":
             stop_loss_delta = round(current_atr * action.stop_loss, 5)
             self.wallet.open_long(stop_loss_delta=stop_loss_delta,
                                   risk_reward_ratio=action.risk_reward,
                                   position_risk=self.trade_risk)
+
         elif action.action == "short":
             stop_loss_delta = round(current_atr * action.stop_loss, 5)
             self.wallet.open_short(stop_loss_delta=stop_loss_delta,
@@ -157,6 +176,23 @@ class RiskManager:
         print('Risk/Reward ratios:', self.risk_reward_ratios)
         print('Trade risk:', self.trade_risk)
         pprint(self._generate_action_space())
+
+    def log_info(self):
+        out = self._action_history
+        out.update({'current_sentiment': self._current_sentiment})
+        return out
+
+    def update_ohlc_buffer(self, ohlct: OHLCT):
+        self.ohlc_buffer = pd.concat([self.ohlc_buffer, ohlct.dataframe],
+                                     ignore_index=False).iloc[-15:]
+        # self.ohlc_buffer = self.ohlc_buffer.append(ohlct.dataframe, ignore_index=False).iloc[-15:]
+
+    def get_atr(self):
+        atr = self.ohlc_buffer.ta.atr(length=14, close='close', high='high', low='low').values[-1]
+        return round(atr, 5)
+
+    def update_wallet(self, ohlct: OHLCT):
+        self.wallet.update_wallet(ohlct=ohlct)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: " \

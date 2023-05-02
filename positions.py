@@ -1,10 +1,10 @@
 import operator
-from typing import Callable, List
+from typing import Callable
 
 import numpy as np
 
 import Utils
-from old_DataProcessing.timeframe import OHLCT
+from DataProcessing.ohlct import OHLCT
 
 XTB = {"EURUSD": {"one_lot_value": 100000,
                   "leverage": 30,
@@ -184,7 +184,7 @@ class Position:
 
 
 class Long(Position):
-    def __init__(self, ticker, open_time, open_price, stop_loss, risk_reward_ratio, position_risk=100):
+    def __init__(self, ticker, open_time, open_price, stop_loss, risk_reward_ratio, position_risk):
         super().__init__(ticker=ticker, open_time=open_time, open_price=open_price, position_risk=position_risk)
         self.stop_loss = stop_loss
         self.position_risk = position_risk
@@ -221,7 +221,7 @@ class Long(Position):
                 self.update_profit(current_price=ohlct.close)
 
         self.steps_count += 1
-        self.profit_history.append(self.profit)
+        self.profit_history.append(round(self.profit, 2))
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.le)
@@ -258,6 +258,8 @@ class Short(Position):
         self.type = 'short'
 
     def update_position(self, ohlct: OHLCT) -> None:
+        self.current_close = ohlct.close
+
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
             self.is_closed = True
@@ -275,7 +277,8 @@ class Short(Position):
             else:
                 self.update_profit(current_price=ohlct.close)
 
-        super().update_position(ohlct=ohlct)
+        self.steps_count += 1
+        self.profit_history.append(round(self.profit, 2))
 
     def __stop_loss_hit(self, ohlct: OHLCT) -> bool:
         return super()._stop_loss_hit(ohlct, operator.ge)

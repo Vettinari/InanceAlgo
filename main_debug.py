@@ -19,7 +19,6 @@ np.set_printoptions(suppress=True)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 reward_buffer = RewardBuffer()
-
 action_validator = ActionValidator(position_reversing=False,
                                    position_closing=False,
                                    action_penalty=-0.001,
@@ -30,8 +29,10 @@ wallet = Wallet(ticker='EURUSD',
                 reward_buffer=reward_buffer)
 
 risk_manager = RiskManager(wallet=wallet,
-                           atr_stop_loss_ratios=[3],
-                           risk_reward_ratios=[1.5, 2, 3],
+                           reward_buffer=reward_buffer,
+                           use_atr=True,
+                           stop_loss_ratios=[1.5],
+                           risk_reward_ratios=[2],
                            portfolio_risk=0.02)
 
 data_stream = DataStream.load_datastream(path='data_streams/15_60_240_data30000')
@@ -43,15 +44,16 @@ env = TradeGym(data_stream=data_stream,
                reward_scaling=0.99,
                verbose=250,
                wandb_logger=False,
-               test=False)
+               test=True)
 
 if __name__ == '__main__':
-    # print(risk_manager.info())
-
+    risk_manager.info()
+    print()
     done = False
     while not done:
         action = int(input("Choose action:"))
         if action == 9:
             break
         env.step(agent_action=action)
-        print(env.risk_manager.wallet)
+
+        print(risk_manager.wallet.info(short=True))

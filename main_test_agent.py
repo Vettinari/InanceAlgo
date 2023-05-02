@@ -25,7 +25,7 @@ wallet = Wallet(ticker=10000,
                 reward_buffer=reward_buffer)
 
 risk_manager = RiskManager(wallet=wallet,
-                           atr_stop_loss_ratios=[3],
+                           stop_loss_ratios=[3],
                            risk_reward_ratios=[1.5, 2],
                            portfolio_risk=0.02)
 

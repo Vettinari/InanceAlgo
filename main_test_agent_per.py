@@ -15,7 +15,7 @@ reward_buffer = RewardBuffer()
 
 risk_manager = RiskManager(ticker=ticker,
                            initial_balance=10000,
-                           atr_stop_loss_ratios=[2],
+                           stop_loss_ratios=[2],
                            risk_reward_ratios=[1.5, 2, 3],
                            manual_position_closing=True,
                            portfolio_risk=0.02,

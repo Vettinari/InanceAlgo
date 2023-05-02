@@ -131,5 +131,5 @@ class DataStream:
         return f'<{self.__class__.__name__}: ' \
                f'\nprocessors={self.data_processors}'
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Dict[int, DataProcessor]:
         return {timeframe: dataprocessor[key] for timeframe, dataprocessor in self.data_processors.items()}
