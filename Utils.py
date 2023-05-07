@@ -93,10 +93,9 @@ def save_object(object_to_save, path: str, filename: str):
         pickle.dump(object_to_save, class_dump)
 
 
-def load_object(path, filename):
+def load_object(path, filename: Optional[str] = None):
     # Create a variable to hold the contents of the object
     object_contents = b""
-
     if filename is None:
         obj = [obj for obj in os.listdir(path) if not obj.startswith(".")]
         filename = obj[0]
@@ -143,7 +142,7 @@ def find_exception_in_function(function, args):
         traceback.print_exc()
 
 
-def time_function(function, args):
+def time_function(function: Callable, args):
     if args is None:
         start = time.time()
         function()
@@ -154,12 +153,6 @@ def time_function(function, args):
         function(args)
         end = round(time.time() - start, 5)
         print(f'{function.__name__} function took: {end} seconds | {round(end / 60, 2)} mins')
-
-
-# def send_telegram(message=None):
-#     message = "PyCharm has finished running!" if message is None else message
-#     url = f"https://api.telegram.org/bot{API_KEY}/sendMessage?chat_id={chat_id}&text={message}"
-#     requests.get(url).json()
 
 
 def printline(text, size=60, line_char="=", blank=False, title=False, test=True):
@@ -202,38 +195,6 @@ def check_file(file_path):
         return False
 
 
-def plot_learning_curve(x, scores, agent_type, figure_file=None):
-    today = str(datetime.today())
-    if figure_file is None:
-        figure_file = f'{os.getcwd()}/benchmarks/{agent_type}_{today}.png'
-
-    running_avg = np.zeros(len(scores))
-    for i in range(len(running_avg)):
-        running_avg[i] = np.mean(scores[max(0, i - 100):(i + 1)])
-
-    plt.plot(x, running_avg)
-    plt.title('Running average of previous 100 scores')
-    plt.savefig(figure_file)
-
-
-def plot_learning(scores, filepath, x=None, window=5):
-    N = len(scores)
-    running_avg = np.empty(N)
-    for t in range(N):
-        running_avg[t] = np.mean(scores[max(0, t - window):(t + 1)])
-    if x is None:
-        x = [i for i in range(N)]
-    plt.ylabel('Score')
-    plt.xlabel('Game')
-    plt.plot(x, running_avg)
-    plt.savefig(filepath)
-    plt.show()
-
-
-def save_processor_config(path, processor_config, filename):
-    save_object(object_to_save=processor_config, path=path, filename=f'{filename}.processor')
-
-
 def move_dir_content(source_dir, destination_dir):
     if os.path.isdir(source_dir):
         destination_dir = make_path(destination_dir)
@@ -254,20 +215,3 @@ def move_dir_content(source_dir, destination_dir):
         os.rmdir(source_dir)
     else:
         print(f'Source directory:\n{source_dir} not found!')
-
-
-def load_configs_from_dir(load_dir: str):
-    agent_config = None
-    processor_config = None
-    for filename in os.listdir(load_dir):
-        if filename.endswith(".processor"):
-            processor_config = load_object(path=load_dir, filename=filename)
-        elif filename.endswith(".agent_config"):
-            agent_config = load_agent_config(path=load_dir, filename=filename)
-    return processor_config, agent_config
-
-
-def timeit(func: Callable):
-    now = datetime.now()
-    func()
-    print(f"This task took {datetime.now() - now}")

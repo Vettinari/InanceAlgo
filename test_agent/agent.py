@@ -40,16 +40,19 @@ class Agent:
                                       input_shape=self.input_shape,
                                       l1_dims=self.l1_dims,
                                       l2_dims=self.l2_dims)
+
         self.Q_next = DuelingDeepQNet(learning_rate=self.learning_rate,
                                       n_actions=self.n_actions,
                                       input_shape=self.input_shape,
                                       l1_dims=self.l1_dims,
                                       l2_dims=self.l2_dims)
+
         self.memory = TorchReplayBuffer(memory_size=self.memory_size,
                                         input_shape=self.input_shape,
                                         network=self.Q_eval)
 
-    def choose_action(self, observation: T.tensor) -> np.array:
+    def choose_action(self, observation: np.array) -> np.array:
+        # observation = T.tensor(observation, dtype=T.float)
         if np.random.random() > self.epsilon:
             state = observation.to(self.Q_eval.device)
             _, advantage = self.Q_eval.forward(state)

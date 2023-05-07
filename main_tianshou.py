@@ -1,20 +1,11 @@
-import copy
-
 import gymnasium
-import gymnasium as gym
-import numpy as np
 import torch
-from tianshou.data import Collector, PrioritizedVectorReplayBuffer, HERVectorReplayBuffer, VectorReplayBuffer
+from tianshou.data import Collector, PrioritizedVectorReplayBuffer
 from tianshou.env import DummyVectorEnv
 from tianshou.policy import PPOPolicy
 from tianshou.trainer import onpolicy_trainer
 from tianshou.utils.net.common import ActorCritic, Net
 from tianshou.utils.net.discrete import Actor, Critic
-
-from old_DataProcessing.data_pipeline import DataPipeline
-from env import TradeGym
-from reward_system import RewardBuffer
-from risk_manager import RiskManager
 
 # ticker = 'EURUSD'
 #

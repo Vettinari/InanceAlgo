@@ -1,9 +1,6 @@
 from pprint import pprint
-
-import numpy as np
 import pandas as pd
 import pandas_ta as ta
-
 import positions
 from DataProcessing.ohlct import OHLCT
 from positions import Position
@@ -34,56 +31,6 @@ class Action:
             return 0
 
 
-class ActionValidator:
-
-    def __init__(self,
-                 reward_buffer: RewardBuffer,
-                 position_reversing: Optional[bool] = None,
-                 position_closing: Optional[bool] = None,
-                 action_penalty: Optional[float] = None):
-        self.position_reversing = position_reversing or False
-        self.position_pre_closing = position_closing or False
-        self.action_penalty = action_penalty or -0.001
-        self.reward_buffer = reward_buffer
-
-    def validate_action(self, position: Position, action: str) -> bool:
-        flag = True
-        reward = 0
-
-        # Standard verification
-        if position is None and (action == 'long' or action == 'short' or action == 'hold'):
-            reward = 0
-            return flag
-
-        # Position cloning
-        if position and position.type == action:
-            reward = self.action_penalty
-            flag = False
-            return flag
-
-        # Closing blank position
-        if not position and action == 'close':
-            reward = self.action_penalty
-            flag = False
-            return flag
-
-        # Position reversing
-        if not self.position_reversing:
-            if position and action not in ['hold', 'close']:
-                reward = self.action_penalty
-                flag = False
-                return flag
-
-        if not self.position_pre_closing:
-            if position and action != 'hold':
-                reward = self.action_penalty
-                flag = False
-                return flag
-
-        self.reward_buffer.add_reward(reward_name='action', reward_value=reward)
-        return flag
-
-
 class RiskManager:
     def __init__(
             self,
@@ -102,12 +49,12 @@ class RiskManager:
         self.atr_stop_loss_ratios: list = stop_loss_ratios or [2]
         self.risk_reward_ratios: list = risk_reward_ratios or [2]
         self.trade_risk: float = self.initial_balance * (portfolio_risk or 0.02)
+        self.max_gain = max(self.risk_reward_ratios) * self.trade_risk
         self.action_dict: dict = self._generate_action_space()
         self._action_history: dict = {str(action): 0 for action in self.action_dict.values()}
         self._current_sentiment: float = 0
         self.ohlc_buffer = pd.DataFrame(columns=['Datetime', 'open', 'high', 'low', 'close', 'volume'], index=[])
         self.reward_buffer = reward_buffer
-        self.reward_buffer.set_trade_risk(self.trade_risk)
 
     def reset(self, dataframe: pd.DataFrame):
         self._current_sentiment = 0
@@ -144,6 +91,9 @@ class RiskManager:
     def get_action_object(self, action_index) -> Action:
         return self.action_dict[action_index]
 
+    def validate_action(self, action: str):
+        pass
+
     def execute_action(self, action: Action):
         if self.use_atr:
             current_atr = self.get_atr()
@@ -155,7 +105,7 @@ class RiskManager:
         # Update current_sentiment
         self._current_sentiment = action.sentiment
 
-        if action.action == "close":
+        if action.action == "close" and self.wallet.position is not None:
             self.wallet.position_close()
 
         elif action.action == "long":
@@ -170,6 +120,9 @@ class RiskManager:
                                    risk_reward_ratio=action.risk_reward,
                                    position_risk=self.trade_risk)
 
+        else:
+            pass
+
     def info(self):
         print('Risk manager:')
         print('Stop losses:', self.atr_stop_loss_ratios)
@@ -177,7 +130,7 @@ class RiskManager:
         print('Trade risk:', self.trade_risk)
         pprint(self._generate_action_space())
 
-    def log_info(self):
+    def get_log_info(self):
         out = self._action_history
         out.update({'current_sentiment': self._current_sentiment})
         return out
@@ -185,7 +138,6 @@ class RiskManager:
     def update_ohlc_buffer(self, ohlct: OHLCT):
         self.ohlc_buffer = pd.concat([self.ohlc_buffer, ohlct.dataframe],
                                      ignore_index=False).iloc[-15:]
-        # self.ohlc_buffer = self.ohlc_buffer.append(ohlct.dataframe, ignore_index=False).iloc[-15:]
 
     def get_atr(self):
         atr = self.ohlc_buffer.ta.atr(length=14, close='close', high='high', low='low').values[-1]

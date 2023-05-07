@@ -1,9 +1,6 @@
-import math
-
 import numpy as np
 import pandas as pd
-from typing import Optional
-from old_DataProcessing.ta import TechnicalIndicator
+from Archive.old_DataProcessing.ta import TechnicalIndicator
 import pandas_ta
 
 

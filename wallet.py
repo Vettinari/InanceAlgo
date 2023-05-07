@@ -24,8 +24,6 @@ class Wallet:
                  initial_balance: float,
                  reward_buffer: RewardBuffer):
         self.reward_buffer = reward_buffer
-        self._position_rewards = {'drawdown': 0,
-                                  'transaction': 0}
         self.max_balance = initial_balance
         self.ticker = ticker.upper()
         self.initial_balance = initial_balance
@@ -35,9 +33,8 @@ class Wallet:
         self.game_over: bool = False
         self.closed_positions = []
         self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
-        self.drawdown_reward = 0
-        self.transaction_reward = 0
         self.total_trades = 0
+        self.cost = 0.8
 
     def reserve_margin(self, amount):
         amount = round(amount, 2)
@@ -53,7 +50,7 @@ class Wallet:
         self.margin_balance['margin'] = 0
 
     def open_long(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
-        self._prepare_to_open_position(close_position_type='short')  # Generates wallet reward
+        self._prepare_to_open_position()
         self.position = Long(ticker=self.ticker,
                              open_time=self.current_ohlct.time,
                              open_price=self.current_ohlct.close,
@@ -63,7 +60,7 @@ class Wallet:
         self.reserve_margin(amount=self.position.margin)
 
     def open_short(self, stop_loss_delta: float, risk_reward_ratio: float, position_risk: float):
-        self._prepare_to_open_position(close_position_type='long')  # Generates wallet reward
+        self._prepare_to_open_position()
         self.position = Short(ticker=self.ticker,
                               open_time=self.current_ohlct.time,
                               open_price=self.current_ohlct.close,
@@ -76,8 +73,8 @@ class Wallet:
         self.position.is_closed = True
         self.position.close_price = self.current_ohlct.close
         self.position.close_time = self.current_ohlct.time
-        self.margin_balance['free'] += self.position.get_real_profit()
         self.free_margin()
+        self.margin_balance['free'] += (self.position.get_real_profit() - self.cost)
         self.__update_dataframe(position=self.position)
         self.get_position_rewards()
         self.position = None
@@ -102,16 +99,17 @@ class Wallet:
 
     def check_and_close_position(self):
         if self.position and self.position.is_closed:
-            self.margin_balance['free'] += self.position.profit
             self.free_margin()
+            self.margin_balance['free'] += (self.position.profit - self.cost)
             self.__update_dataframe(position=self.position)
             self.get_position_rewards()
             self.position = None
 
-    def state(self, include_balance=False) -> list:
+    def state(self, max_gain: float, trade_risk: float, include_balance: bool = False) -> list:
         long_position = 1 if self.position and self.position.type == 'long' else 0
         short_position = 1 if self.position and self.position.type == 'short' else 0
         position_profit = self.position.get_profit() if self.position else 0
+        position_profit = position_profit / max_gain if position_profit > 0 else position_profit / trade_risk
 
         if include_balance:
             return [self.total_balance / 100000, short_position, long_position, position_profit]
@@ -142,8 +140,6 @@ class Wallet:
         self.game_over = False
         self.margin_balance = {"free": self.initial_balance, "margin": 0}
         self.update_wallet(ohlct=ohlct)
-        self.drawdown_reward = 0
-        self.transaction_reward = 0
         self.total_trades = 0
         self.closed_positions = []
         self.history_dataframe = pd.DataFrame(columns=dataframe_columns, index=[])
@@ -152,8 +148,8 @@ class Wallet:
         self.margin_balance['free'] += self.position.margin
         self.position = None
 
-    def _prepare_to_open_position(self, close_position_type):
-        if self.position is not None and self.position.type == close_position_type:
+    def _prepare_to_open_position(self):
+        if self.position is not None:
             self.position_close()
 
     def __update_dataframe(self, position: Position):
@@ -175,7 +171,8 @@ class Wallet:
         self.total_trades += 1
 
     def __repr__(self):
-        return f"<Wallet: margin_balance={self.margin_balance} position_profit={self.position.get_profit() if self.position else None}>"
+        return f"<Wallet: margin_balance={self.margin_balance} " \
+               f"position_profit={self.position.get_profit() if self.position else None}>"
 
     def evaluation(self, returns) -> dict:
         """
@@ -205,7 +202,7 @@ class Wallet:
         return out
 
     def is_game_over(self):
-        if self.total_balance < 2000:
+        if self.total_balance < 0:
             self.game_over = True
 
     @staticmethod
@@ -239,6 +236,8 @@ class Wallet:
         """
         downside_returns = np.minimum(returns - mar, 0)
         downside_volatility = np.std(downside_returns)
+        if downside_volatility.any() == 0:
+            return 0.0
         sortino = (np.mean(returns) - risk_free_rate) / downside_volatility
         return sortino
 
@@ -271,8 +270,11 @@ class Wallet:
         """
         profit = np.sum(returns[returns > 0])
         loss = np.sum(returns[returns < 0])
-        pf = profit / -loss
-        return pf
+        if loss > 0:
+            pf = profit / -loss
+            return pf
+        else:
+            return profit
 
     @staticmethod
     def average_trade_return(returns):
@@ -304,17 +306,6 @@ class Wallet:
         wr = wins / total_trades
         return wr
 
-    def position_drawdown_reward(self):
-        cumulative_returns = np.cumsum(self.position.profit_history)
-        cumulative_max = np.maximum.accumulate(cumulative_returns)
-        drawdowns = (cumulative_max - cumulative_returns) / cumulative_max
-        max_drawdown = -np.max(drawdowns)
-
-        if max_drawdown == np.nan:
-            return 0
-        else:
-            return max_drawdown
-
     def position_transaction_reward(self):
         if self.position and self.position.is_closed:
             return self.position.profit
@@ -322,7 +313,5 @@ class Wallet:
             return 0
 
     def get_position_rewards(self):
-        self.reward_buffer.add_reward(reward_name='drawdown',
-                                      reward_value=self.position_drawdown_reward())
         self.reward_buffer.add_reward(reward_name='transaction',
                                       reward_value=self.position_transaction_reward())

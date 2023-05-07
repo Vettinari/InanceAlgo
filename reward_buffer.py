@@ -1,45 +1,57 @@
-from typing import Optional
+from pprint import pprint
+from typing import Optional, Dict, Tuple
 
 import pandas as pd
 
 
 class RewardBuffer:
     def __init__(self):
-        self._rewards = {'action': 0, 'transaction': 0, 'drawdown': 0}
+        self._rewards: Dict[str, float] = {}
         self.rewards_history = pd.DataFrame(columns=list(self._rewards.keys()),
                                             index=[], dtype=float)
         self.trade_risk = None
+        self.reset_reward_dict()
 
     def add_reward(self, reward_name, reward_value):
-        assert reward_name in self._rewards.keys(), "Reward name not in reward buffer"
         self._rewards[reward_name] = reward_value
 
-    def yield_rewards(self):
+    def yield_rewards(self, trade_risk: float, max_gain: float) -> Tuple[Dict[str, float], Dict[str, float]]:
+        # Scale rewards
+        self.process_rewards(trade_risk=trade_risk, max_gain=max_gain)
+        # Add rewards to history
+        self.rewards_history = pd.concat([self.rewards_history,
+                                          pd.DataFrame(self._rewards, index=[0])],
+                                         axis=0, ignore_index=True)
+        # Prepare info for logging
+        rewards_info = self.get_log_info()
+        # Reset rewards
         out = self._rewards
 
-        self.rewards_history = pd.concat([self.rewards_history,
-                                          pd.DataFrame(out, index=[0])],
-                                         axis=0, ignore_index=True)
-        self._rewards = {'action': 0, 'transaction': 0, 'drawdown': 0}
+        rewards_info = dict(zip(rewards_info.keys(), [round(val, 5) for val in rewards_info.values()]))
+        out = dict(zip(out.keys(), [round(val, 5) for val in out.values()]))
 
-        return out
+        self.reset_reward_dict()
+        return out, rewards_info
 
     def reset(self):
-        self._rewards = {'action': 0, 'transaction': 0, 'drawdown': 0}
+        self.reset_reward_dict()
         self.rewards_history = pd.DataFrame(columns=list(self._rewards.keys()),
                                             index=[])
 
-    def log_info(self, sum_only=False) -> dict:
+    def get_log_info(self) -> dict:
         """
         :returns: total_rewards and rewards for each reward type
-        :param sum_only: if True, only returns the sum of each reward type
         """
-        sums = {f"{key}_reward_sum": val for key, val in self.rewards_history.sum(axis=0).to_dict().items()}
+        sums = {f"{key}_rewards": val for key, val in self.rewards_history.sum(axis=0).to_dict().items()}
         sums.update({"total_rewards": sum(sums.values())})
-        if not sum_only:
-            means = {f"{key}_mean": val for key, val in self.rewards_history.mean(axis=0).to_dict()}
-            sums.update(means)
         return sums
 
-    def set_trade_risk(self, trade_risk):
-        self.trade_risk = trade_risk
+    def process_rewards(self, trade_risk: float, max_gain: float) -> Dict[str, float]:
+        if self._rewards['transaction']:
+            if self._rewards['transaction'] > 0:
+                self._rewards['transaction'] /= max_gain
+            else:
+                self._rewards['transaction'] /= trade_risk
+
+    def reset_reward_dict(self):
+        self._rewards = {'transaction': 0}

@@ -240,7 +240,7 @@ class Long(Position):
 
 
 class Short(Position):
-    def __init__(self, ticker, open_time, open_price, stop_loss, risk_reward_ratio, position_risk=100):
+    def __init__(self, ticker, open_time, open_price, stop_loss, risk_reward_ratio, position_risk):
         super().__init__(ticker=ticker, open_time=open_time, open_price=open_price, position_risk=position_risk)
         self.stop_loss = stop_loss
         self.position_risk = position_risk
@@ -259,7 +259,6 @@ class Short(Position):
 
     def update_position(self, ohlct: OHLCT) -> None:
         self.current_close = ohlct.close
-
         # CHECK CONTINUITY
         if self.__stop_loss_hit(ohlct):
             self.is_closed = True

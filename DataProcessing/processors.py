@@ -1,8 +1,10 @@
+import enum
 import io
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
+import pandas_ta as ta
 from PIL import Image
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -12,12 +14,14 @@ import Utils
 
 class DataProcessor:
     def __init__(self, timeframe: int, window: int = 1):
-        self._train_data: dict = {}
-        self._test_data: dict = {}
-        self.timeframe = timeframe
-        self.window = window
+        # Parameters
+        self.timeframe: int = timeframe
+        self.window: int = window
+        # Data
+        self._train_data: Dict[int, pd.DataFrame] = {}
+        self._test_data: Dict[int, pd.DataFrame] = {}
 
-    def process_train_data(self, key, data_window: pd.DataFrame):
+    def process_train_data(self, key: int, data_window: pd.DataFrame) -> None:
         fresh_data = data_window.groupby(pd.Grouper(freq=f'{self.timeframe}T')).agg(
             {
                 'open': 'first',
@@ -29,7 +33,7 @@ class DataProcessor:
         fresh_data.dropna(inplace=True, axis=0)
         self._train_data[key] = fresh_data.iloc[-self.window:]
 
-    def process_test_data(self, key, data_window: pd.DataFrame):
+    def process_test_data(self, key: int, data_window: pd.DataFrame) -> None:
         fresh_data = data_window.groupby(pd.Grouper(freq=f'{self.timeframe}T')).agg(
             {
                 'open': 'first',
@@ -42,25 +46,21 @@ class DataProcessor:
         self._test_data[key] = fresh_data.iloc[-self.window:]
 
     @property
-    def train_data(self):
+    def train_data(self) -> Dict[int, pd.DataFrame]:
         return self._train_data
 
     @property
-    def test_data(self):
+    def test_data(self) -> Dict[int, pd.DataFrame]:
         return self._test_data
 
-    @staticmethod
-    def load_processor(path):
-        return Utils.load_object(path=path, filename='data_processor.data')
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"DataProcessor: timeframe={self.timeframe} window={self.window} " \
                f"train_data={len(self._train_data)} test_data={len(self._test_data)}"
 
-    def __call__(self, timeframe, window):
+    def __call__(self, timeframe: int, window: int):
         self.__init__(timeframe=timeframe, window=window)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> pd.DataFrame:
         key = key.split("_")
         data_type = key[0]
         index = int(key[-1])

@@ -4,7 +4,7 @@ import pandas as pd
 from PIL import Image
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from old_DataProcessing.processors import DataProcessor
+from Archive.old_DataProcessing.processors import DataProcessor
 
 
 class Renderer(DataProcessor):
