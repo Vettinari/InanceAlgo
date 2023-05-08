@@ -1,15 +1,16 @@
-from concurrent.futures import ThreadPoolExecutor
-import numpy as np
-import pandas as pd
-from datetime import timedelta
-from typing import Dict, List, Optional
-from tqdm.auto import tqdm
+from multiprocessing import Pool
 
 import Utils
+import numpy as np
+import pandas as pd
+from tqdm.auto import tqdm
+from datetime import timedelta
+from typing import Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor
 from DataProcessing.processors import DataProcessor
 
 
-class BaseDataStream:
+class DataStream:
     def __init__(self, ticker: str,
                  timeframes: list,
                  data_processor_type: DataProcessor,
@@ -33,12 +34,63 @@ class BaseDataStream:
         # Initialize functions
         self._load_csv_data()
         self._clean_dataframe()
+        # self._add_technicals()
 
         if self.data_size:
             self.dataframe = self.dataframe.iloc[-self.data_size:]
 
         self.processors: List[DataProcessor] = []
         self.split_index: int = int(len(self.dataframe) * self.data_split) if self.data_split else len(self.dataframe)
+
+    def run_single_timeframe(self, interval: int) -> DataProcessor:
+
+        data_processor = self.data_processor_type(timeframe=interval, window=self.processor_window_output)
+
+        for key, window_start in tqdm(enumerate(range(self.data_window_size, self.split_index)),
+                                      desc=f"{interval}_train",
+                                      position=self.timeframes.index(interval),
+                                      leave=False,
+                                      ncols=100):
+            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
+            data_processor.process_train_data(key=key, data_window=window)
+
+        for key, window_start in tqdm(enumerate(range(self.split_index, len(self.dataframe))),
+                                      desc=f"{interval}_test",
+                                      position=self.timeframes.index(interval),
+                                      leave=False,
+                                      ncols=100):
+            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
+            data_processor.process_test_data(key=key, data_window=window)
+
+        return data_processor
+
+    def run_multithread(self) -> None:
+        with Pool(3) as pool:
+            for result in pool.imap_unordered(self.run_single_timeframe, self.timeframes):
+                self.processors.append(result)
+
+        self.data_processors = {processor.timeframe: processor for processor in self.processors}
+
+    def get_hindsight_data(self, current_step: int, horizon: int) -> pd.DataFrame:
+        """
+        Returns data from the future for training purposes (hindsight rewards).
+        :param current_step: int - current step in the data stream
+        :param horizon: int - number of steps into the future
+        :return: pd.DataFrame - data from the future
+        """
+        return self.data_processors[self.step_size].train_data[current_step + horizon]
+
+    def save_datastream(self):
+        path = f'data_streams/{"_".join(map(str, self.timeframes))}'
+        filename = f'{self.ticker}_window{self.processor_window_output}.data_stream'
+        if self.data_size:
+            path += f"_data{self.data_size}"
+        Utils.save_object(object_to_save=self, path=path, filename=filename)
+
+    def max_steps(self, data_type='train') -> int:
+        if data_type == 'train':
+            return len(self.data_processors[self.step_size].train_data.keys()) - self.data_window_size - 1
+        return len(self.data_processors[self.step_size].test_data.keys()) - 1
 
     def _load_csv_data(self) -> None:
         self.step_size = min(self.timeframes)
@@ -61,32 +113,6 @@ class BaseDataStream:
         # Save old datatime index and reset index
         self.dataframe.dropna(axis=0, inplace=True)
         self.dataframe.drop(columns=['forex_open'], axis=0, inplace=True)
-
-    def run_single_timeframe(self, interval: int) -> DataProcessor:
-        pass
-
-    def run_multithread(self) -> None:
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            self.processors = list(executor.map(self.run_single_timeframe, self.timeframes))
-
-        self.data_processors = {processor.timeframe: processor for processor in self.processors}
-
-    def get_hindsight_data(self, current_step: int, horizon: int, data_type: str = 'train') -> pd.DataFrame:
-        if data_type == 'train':
-            return self.data_processors[self.step_size].train_data[current_step + horizon]
-        return self.data_processors[self.step_size].test_data[current_step + horizon]
-
-    def save_datastream(self):
-        path = f'data_streams/{"_".join(map(str, self.timeframes))}'
-        filename = f'{self.ticker}_window{self.processor_window_output}.data_stream'
-        if self.data_size:
-            path += f"_data{self.data_size}"
-        Utils.save_object(object_to_save=self, path=path, filename=filename)
-
-    def max_steps(self, data_type='train') -> int:
-        if data_type == 'train':
-            return len(self.data_processors[self.step_size].train_data.keys()) - self.data_window_size - 1
-        return len(self.data_processors[self.step_size].test_data.keys()) - 1
 
     def info(self) -> None:
         print(self.__repr__())
@@ -117,59 +143,3 @@ class BaseDataStream:
 
     def __getitem__(self, key: str) -> Dict[int, DataProcessor]:
         return {timeframe: dataprocessor[key] for timeframe, dataprocessor in self.data_processors.items()}
-
-
-class TrainingDataStream(BaseDataStream):
-    def __init__(self,
-                 ticker: str,
-                 timeframes: list,
-                 data_processor_type: DataProcessor,
-                 technicals: List[str],
-                 processor_window_output: int,
-                 test: bool = False,
-                 data_split: Optional[float] = 0.9,
-                 data_size: Optional[int] = None):
-        super().__init__(ticker=ticker, timeframes=timeframes, data_processor_type=data_processor_type,
-                         technicals=technicals, processor_window_output=processor_window_output, test=test,
-                         data_split=data_split, data_size=data_size)
-
-    def run_single_timeframe(self, interval: int) -> DataProcessor:
-        data_processor = self.data_processor_type(timeframe=interval, window=self.processor_window_output)
-
-        for key, window_start in tqdm(enumerate(range(self.data_window_size, self.split_index)),
-                                      desc=f"{interval}_train",
-                                      position=self.timeframes.index(interval),
-                                      leave=False,
-                                      ncols=100):
-            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
-            data_processor.process_train_data(key=key, data_window=window)
-
-        return data_processor
-
-
-class TestingDataStream(BaseDataStream):
-    def __init__(self,
-                 ticker: str,
-                 timeframes: list,
-                 data_processor_type: DataProcessor,
-                 technicals: List[str],
-                 processor_window_output: int,
-                 test: bool = False,
-                 data_split: Optional[float] = 0.9,
-                 data_size: Optional[int] = None):
-        super().__init__(ticker=ticker, timeframes=timeframes, data_processor_type=data_processor_type,
-                         technicals=technicals, processor_window_output=processor_window_output, test=test,
-                         data_split=data_split, data_size=data_size)
-
-    def run_single_timeframe(self, interval: int) -> DataProcessor:
-        data_processor = self.data_processor_type(timeframe=interval, window=self.processor_window_output)
-
-        for key, window_start in tqdm(enumerate(range(self.split_index, len(self.dataframe))),
-                                      desc=f"{interval}_test",
-                                      position=self.timeframes.index(interval),
-                                      leave=False,
-                                      ncols=100):
-            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
-            data_processor.process_test_data(key=key, data_window=window)
-
-        return data_processor
