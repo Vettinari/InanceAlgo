@@ -11,7 +11,6 @@ import gzip
 import os
 from pathlib import Path
 
-import requests
 import datetime
 import traceback
 import numpy as np

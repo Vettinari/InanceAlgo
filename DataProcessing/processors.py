@@ -8,18 +8,32 @@ import pandas_ta as ta
 from PIL import Image
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-import Utils
+import dill as pickle
+import tensorflow as tf
 
 
 class DataProcessor:
-    def __init__(self, timeframe: int, window: int = 1):
+    def __init__(self, timeframe: int, predictor_input_shape: tuple, predictor_output_size: int, window: int = 1):
         # Parameters
         self.timeframe: int = timeframe
         self.window: int = window
+
         # Data
         self._train_data: Dict[int, pd.DataFrame] = {}
         self._test_data: Dict[int, pd.DataFrame] = {}
+        self.predictor: tf.keras.Model = tf.keras.Model.Sequential(
+            [tf.keras.layers.GRU(16,
+                                 input_shape=predictor_input_shape,
+                                 return_sequences=False,
+                                 kernel_initializer=tf.keras.initializers.GlorotUniform(),
+                                 kernel_regularizer=tf.keras.regularizers.l2(
+                                     0.0001),
+                                 name='gru'),
+             tf.keras.layers.Dense(predictor_output_size,
+                                   kernel_initializer=tf.keras.initializers.HeUniform(),
+                                   activation='linear',
+                                   name='linear_activation')
+             ])
 
     def process_train_data(self, key: int, data_window: pd.DataFrame) -> None:
         fresh_data = data_window.groupby(pd.Grouper(freq=f'{self.timeframe}T')).agg(

@@ -9,8 +9,9 @@ import wandb
 from gym.core import ObsType
 from gymnasium import spaces
 from sklearn.preprocessing import MinMaxScaler
+import dill
 
-from DataProcessing.data_stream import BaseDataStream
+from DataProcessing.data_stream import DataStream
 from DataProcessing.ohlct import OHLCT
 from reward_buffer import RewardBuffer
 from risk_manager import RiskManager
@@ -19,7 +20,7 @@ from risk_manager import RiskManager
 class TradeGym(gymnasium.Env):
     def __init__(self,
                  risk_manager: RiskManager,
-                 data_stream: BaseDataStream,
+                 data_stream: DataStream,
                  reward_buffer: RewardBuffer,
                  reward_scaling: float,
                  verbose: Optional[int] = 250,
@@ -27,7 +28,9 @@ class TradeGym(gymnasium.Env):
                  env_type: str = 'train',
                  state_stacking: int = 4,
                  full_control: Optional[bool] = True,
-                 test: Optional[bool] = False):
+                 test: Optional[bool] = False,
+                 predictor_path: str = None):
+
         self.env_type: str = env_type
         self.test: bool = test
 
@@ -52,7 +55,7 @@ class TradeGym(gymnasium.Env):
 
         # Objects
         self.risk_manager: RiskManager = risk_manager
-        self.data_stream: BaseDataStream = data_stream
+        self.data_stream: DataStream = data_stream
         self.reward_buffer: RewardBuffer = reward_buffer
 
         self.max_steps: int = self.data_stream.max_steps(data_type=self.env_type)
@@ -66,6 +69,7 @@ class TradeGym(gymnasium.Env):
         # Spaces generation after reset
         self.action_space = spaces.Discrete(n=len(risk_manager.action_dict.values()), start=0)
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(len(self.state * self.state_stacking),))
+        self.predictor = dill.load(open(f"{predictor_path}", "rb"))
 
     def step(self, agent_action) -> Tuple[np.array, float, bool, bool, dict]:
         log_dict = {}
