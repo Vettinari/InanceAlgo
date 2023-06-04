@@ -1,6 +1,6 @@
 import enum
 import io
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,31 +11,39 @@ from plotly.subplots import make_subplots
 import dill as pickle
 import tensorflow as tf
 
+from Oracle import Oracle
+
 
 class DataProcessor:
-    def __init__(self, timeframe: int, predictor_input_shape: tuple, predictor_output_size: int, window: int = 1):
+    def __init__(self, timeframe: int, window: int = 1, use_oracle: bool = False,
+                 ma_lengths: Optional[List[int]] = None):
         # Parameters
         self.timeframe: int = timeframe
         self.window: int = window
+        self.ma_lengths: List[int] = [3, 5, 13] if ma_lengths is None else ma_lengths
 
         # Data
         self._train_data: Dict[int, pd.DataFrame] = {}
         self._test_data: Dict[int, pd.DataFrame] = {}
-        self.predictor: tf.keras.Model = tf.keras.Model.Sequential(
-            [tf.keras.layers.GRU(16,
-                                 input_shape=predictor_input_shape,
-                                 return_sequences=False,
-                                 kernel_initializer=tf.keras.initializers.GlorotUniform(),
-                                 kernel_regularizer=tf.keras.regularizers.l2(
-                                     0.0001),
-                                 name='gru'),
-             tf.keras.layers.Dense(predictor_output_size,
-                                   kernel_initializer=tf.keras.initializers.HeUniform(),
-                                   activation='linear',
-                                   name='linear_activation')
-             ])
+
+        # Predictor model for this processor
+        if use_oracle:
+            self.oracle: Oracle = Oracle(prediction_goals=[f'close_{self.timeframe}'], )
+
+    # def process_train_data(self, key: int, data_window: pd.DataFrame) -> None:
+    #     fresh_data = data_window.groupby(pd.Grouper(freq=f'{self.timeframe}T')).agg(
+    #         {
+    #             'open': 'first',
+    #             'close': 'last',
+    #             'low': 'min',
+    #             'high': 'max',
+    #             'volume': 'sum',
+    #         })
+    #     fresh_data.dropna(inplace=True, axis=0)
+    #     self._train_data[key] = fresh_data.iloc[-self.window:]
 
     def process_train_data(self, key: int, data_window: pd.DataFrame) -> None:
+        # Group the data according to the timeframe
         fresh_data = data_window.groupby(pd.Grouper(freq=f'{self.timeframe}T')).agg(
             {
                 'open': 'first',
@@ -44,6 +52,38 @@ class DataProcessor:
                 'high': 'max',
                 'volume': 'sum',
             })
+
+        # Drop NaN values
+        fresh_data.dropna(inplace=True, axis=0)
+
+        # Calculate moving averages
+        y_label_comp = y_label[0].split("_")[0]
+
+        for ma_length in self.ma_lengths:
+            fresh_data[f'{y_label_comp}_{ma_length}'] = fresh_data[y_label_comp].rolling(ma_length).mean()
+
+        df.dropna(inplace=True, axis=0)
+
+        # Clip volume values
+        df['volume'] = df['volume'].clip(lower=df['volume'].quantile(0.01),
+                                         upper=df['volume'].quantile(0.99))
+
+        # Process the volume to represent bias of selling/buying
+        df['volume'] = df.apply(lambda row: row['volume'] if row['close'] - row['open'] > 0 else -row['volume'], axis=1)
+        df.drop(['open'], axis=1, inplace=True)
+
+        df = df[sorted(df.columns)]
+
+        X_scaler = MinMaxScaler()
+        y_scaler = MinMaxScaler()
+
+        X = pd.DataFrame(X_scaler.fit_transform(df), columns=df.columns, index=df.index)
+
+        y = df[y_label]
+        y = pd.DataFrame(y_scaler.fit_transform(y), columns=y.columns, index=y.index)
+
+        return X, y, X_scaler, y_scaler
+
         fresh_data.dropna(inplace=True, axis=0)
         self._train_data[key] = fresh_data.iloc[-self.window:]
 
