@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import Utils
 import pandas as pd
-from DataProcessing.ohlct import OHLCT
+from Archive.ohlct import OHLCT
 from positions import Position, Long, Short
 from reward_buffer import RewardBuffer
 

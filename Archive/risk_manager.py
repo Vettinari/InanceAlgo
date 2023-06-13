@@ -1,9 +1,7 @@
 from pprint import pprint
 import pandas as pd
-import pandas_ta as ta
 import positions
-from DataProcessing.ohlct import OHLCT
-from positions import Position
+from Archive.ohlct import OHLCT
 from reward_buffer import RewardBuffer
 from wallet import Wallet
 from typing import List, Optional

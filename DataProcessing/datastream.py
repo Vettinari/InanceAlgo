@@ -1,5 +1,7 @@
 from multiprocessing import Pool
 
+from sklearn.preprocessing import MinMaxScaler
+
 import Utils
 import numpy as np
 import pandas as pd
@@ -8,6 +10,42 @@ from datetime import timedelta
 from typing import Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor
 from DataProcessing.processors import DataProcessor
+
+
+class OHLCVMinMaxScaler:
+    def __init__(self, feature_range: tuple = (0, 1)):
+        self.feature_range = feature_range
+        self.min_val = None
+        self.max_val = None
+        self.volume_scaler = MinMaxScaler()
+
+    def fit(self, X: pd.DataFrame, low:str ='low', high:str='high'):
+        # Fit self
+        self.min_val = X[low].min(axis=0)
+        self.max_val = X[high].max(axis=0)
+        # Fit volume_scaler
+        self.volume_scaler.fit(X=X.volume)
+
+    def transform(self, X: pd.DataFrame):
+        # Split to OHLC
+        ohlc_df = X[['open', 'close', 'high', 'low']]
+        ohlc_normalized = (ohlc_df - self.min_val) / (self.max_val - self.min_val)
+        ohlc_scaled = ohlc_normalized * (self.feature_range[1] - self.feature_range[0]) + self.feature_range[0]
+        ohlc_scaled_df = pd.DataFrame(ohlc_scaled,
+                                      columns=ohlc_df.columns,
+                                      index=X.index)
+        # Split to volume
+        volume_df = X[['volume']]
+        volume_scaled = self.volume_scaler.transform(volume_df)
+        volume_scaled_df = pd.DataFrame(volume_scaled,
+                                        columns=['volume'],
+                                        index=X.index)
+
+        return pd.concat([ohlc_scaled_df, volume_scaled_df], axis=1)
+
+    def fit_transform(self, X: pd.DataFrame):
+        self.fit(X)
+        return self.transform(X)
 
 
 class DataStream:
@@ -31,6 +69,7 @@ class DataStream:
         self.data_window_size = int((max(self.timeframes) / self.step_size) * self.processor_window_output) * 2
         self.data_size: int = data_size
         self.data_split: float = data_split
+        self.ohlc_scaler = OHLCVMinMaxScaler()
         # Initialize functions
         self._load_csv_data()
         self._clean_dataframe()
@@ -113,6 +152,20 @@ class DataStream:
         # Save old datatime index and reset index
         self.dataframe.dropna(axis=0, inplace=True)
         self.dataframe.drop(columns=['forex_open'], axis=0, inplace=True)
+
+        # OHLC Scaler
+        ohlc_df = self.dataframe[['open', 'close', 'high', 'low']]
+        ohlc_df = pd.DataFrame(self.ohlc_scaler.fit_transform(ohlc_df),
+                               columns=ohlc_df.columns,
+                               index=ohlc_df.index)
+        # Volume scaler
+        volume_df = self.dataframe[['volume']]
+        ohlc_df = pd.DataFrame(self.volume_scaler.fit_transform(self.dataframe[['volume']]),
+                               columns=volume_df.columns,
+                               index=volume_df.index)
+
+        # Merge the scaled versions
+        self.dataframe = pd.concat([ohlc_df, volume_df], axis=1)
 
     def info(self) -> None:
         print(self.__repr__())
