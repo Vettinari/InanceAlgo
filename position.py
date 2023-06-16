@@ -1,11 +1,99 @@
 from typing import Dict, Optional
 
 import pandas as pd
+from xtb import XTB
 
-one_lot_contract_value = 100000
+
+class ContinuousPosition:
+
+    def __init__(self,
+                 order_type: str,
+                 ticker: str):
+        self.ticker: str = ticker
+        self.order_type: str = order_type.lower()
+        self._order_number: Optional[str] = None
+
+        # Continuous values
+        self.profit = 0
+        self.position_margin: float = 0
+        self.total_volume = 0
+        self.avg_price: float = 0
+        self.contract_value: float = 0
+
+        # Calculated
+        self.leverage: int = XTB[ticker]['leverage']
+        self.one_pip: float = XTB[ticker]['one_pip']
+        self.one_lot_value = XTB[ticker]['one_lot_value']
+
+    def modify_position(self, current_price, volume) -> float:
+        if volume > 0:
+            total_value = (self.total_volume * self.avg_price) + (volume * current_price)
+            self.total_volume = round(self.total_volume + volume, 3)
+            self.avg_price = round(total_value / self.total_volume, 4)
+
+            self.contract_value = round(self.total_volume * self.one_lot_value, 2)
+            margin = round((volume * self.one_lot_value) / self.leverage, 2)
+            self.position_margin = round(self.position_margin + margin, 2)
+            return -margin
+
+        elif volume < 0:
+            profit = self.calculate_profit(current_price=current_price, volume=abs(volume))
+            margin_released = round((abs(volume) * self.one_lot_value) / self.leverage, 2)
+
+            self.total_volume = round(self.total_volume + volume, 3)
+
+            # If all shares are sold, average acquisition price becomes 0
+            if self.total_volume != 0:
+                self.position_margin = round(self.position_margin - margin_released, 2)
+                self.contract_value = round(self.total_volume * self.one_lot_value, 2)
+            else:
+                self.avg_price = 0
+                self.position_margin = 0
+                self.contract_value = 0
+
+            return margin_released + profit
+
+        else:
+            return 0
+
+    def calculate_profit(self, current_price: float, volume: Optional[float] = None) -> int:
+        volume = self.total_volume if volume is None else volume
+        cur_value = current_price * volume * self.one_lot_value
+        open_value = self.avg_price * volume * self.one_lot_value
+        return round(cur_value - open_value, 2) if self.order_type == 'long' else round(open_value - cur_value, 2)
+
+    def info(self) -> None:
+        print(f'{self.order_type.capitalize()}: '
+              f'Avg_price = {self.avg_price} '
+              f'Volume = {self.total_volume} '
+              f'Contract_value = {self.contract_value} '
+              f'Position_margin = {self.position_margin}\n')
+
+    def __repr__(self) -> str:
+        return f"<{self.order_type.capitalize()}: " \
+               f"avg_price={self.avg_price}, " \
+               f"profit={self.profit or 0}>"
+
+    @property
+    def order_number(self) -> str:
+        return self._order_number
+
+    @order_number.setter
+    def order_number(self, value) -> None:
+        self._order_number = value
+
+    def __dict__(self) -> dict:
+        return {
+            "order_type": self.order_type,
+            "ticker": self.ticker,
+            "profit": self.profit,
+            "position_margin": self.position_margin,
+            "total_volume": self.total_volume,
+            "avg_price": self.avg_price
+        }
 
 
-class Position:
+class DiscretePosition:
 
     def __init__(self,
                  order_type: str,
@@ -31,7 +119,8 @@ class Position:
         self._order_number: Optional[str] = None
 
         # Calculated
-        self.volume: float = round(self.contract_value / one_lot_contract_value, 5)
+
+        self.volume: float = round(self.contract_value / XTB[ticker]['one_lot_value'], 5)
         self._stop_loss_pips = stop_loss_pips
         self._stop_profit_pips = stop_profit_pips
         self._set_stop_loss()

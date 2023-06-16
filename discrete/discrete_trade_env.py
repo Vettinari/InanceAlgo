@@ -7,24 +7,8 @@ import pandas as pd
 from typing import Dict, Optional, List, Tuple
 
 from DataProcessing.datastream import DataStream
-from position import Position
-
-XTB = {"EURUSD": {"one_lot_value": 100000,
-                  "leverage": 30,
-                  "one_pip": 0.0001,
-                  "spread": 0.00008},
-       "EURCAD": {"one_lot_value": 100000,
-                  "leverage": 30,
-                  "one_pip": 0.0001},
-       "EURCHF": {"one_lot_value": 100000,
-                  "leverage": 30,
-                  "one_pip": 0.0001},
-       "EURGBP": {"one_lot_value": 100000,
-                  "leverage": 30,
-                  "one_pip": 0.0001},
-       "EURJPY": {"one_lot_value": 100000,
-                  "leverage": 30,
-                  "one_pip": 0.01}}
+from position import DiscretePosition
+from xtb import XTB
 
 
 class DiscreteTradingEnv(gymnasium.Env):
@@ -46,7 +30,7 @@ class DiscreteTradingEnv(gymnasium.Env):
             'spread']
         self.pip_value: float = XTB['EURUSD']['one_pip'] if self.datastream.ticker == 'TEST' else \
             XTB[datastream.ticker]['one_pip']
-        self.history: pd.DataFrame = pd.DataFrame(columns=Position.__dict__, index=[])
+        self.history: pd.DataFrame = pd.DataFrame(columns=DiscretePosition.__dict__, index=[])
 
         # Basic risk management
         self.risk: float = risk
@@ -60,7 +44,7 @@ class DiscreteTradingEnv(gymnasium.Env):
         self.current_state: np.array = None
         self.current_price: float = 0
         self.balance: float = self.initial_balance
-        self.positions: List[Position] = []
+        self.positions: List[DiscretePosition] = []
         self.reward = 0
         self.reset()
 
@@ -69,9 +53,9 @@ class DiscreteTradingEnv(gymnasium.Env):
         self.current_step = 0
         self.current_date = self.datastream.generator.cursor
         self.current_price = 0
-        self.positions: List[Position] = []
+        self.positions: List[DiscretePosition] = []
         self.balance: float = self.initial_balance
-        self.history = pd.DataFrame(columns=Position.__dict__, index=[])
+        self.history = pd.DataFrame(columns=DiscretePosition.__dict__, index=[])
 
         self.current_state = self.update_state_price_positions()
 
@@ -98,21 +82,21 @@ class DiscreteTradingEnv(gymnasium.Env):
         elif position_type == 'short':
             current_price = current_price - self.spread
 
-        position = Position(order_type=position_type,
-                            ticker=self.datastream.ticker,
-                            open_time=self.current_date,
-                            open_price=current_price,
-                            stop_loss_pips=self.stop_loss_pips,
-                            stop_profit_pips=self.stop_profit_pips,
-                            leverage=self.leverage,
-                            one_pip=self.pip_value,
-                            position_margin=self.position_margin)
+        position = DiscretePosition(order_type=position_type,
+                                    ticker=self.datastream.ticker,
+                                    open_time=self.current_date,
+                                    open_price=current_price,
+                                    stop_loss_pips=self.stop_loss_pips,
+                                    stop_profit_pips=self.stop_profit_pips,
+                                    leverage=self.leverage,
+                                    one_pip=self.pip_value,
+                                    position_margin=self.position_margin)
 
         # Update balance
         self.balance -= self.position_margin
         self.positions.append(position)
 
-    def close_position(self, position: Position):
+    def close_position(self, position: DiscretePosition):
         self.balance += position.margin
         self.balance += position.realized_profit
 

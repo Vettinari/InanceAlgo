@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import numpy as np
 import pandas as pd
 from datetime import timedelta
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 import pandas_ta as ta
 
 from sklearn.preprocessing import MinMaxScaler
@@ -200,7 +200,7 @@ class DataGenerator:
             temp_df = self.timeframes[timeframe].iloc[start_index:end_index].copy()
 
             if timeframe != self.step_size:
-                temp_df[f'{timeframe}_update'] = item.minute % timeframe == 0
+                temp_df[f'{timeframe}_update'] = 1 if item.minute % timeframe == 0 else 0
 
             out.append(temp_df)
 
