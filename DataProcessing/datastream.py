@@ -1,15 +1,12 @@
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
-from sklearn.preprocessing import MinMaxScaler
-
-import Utils
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 from datetime import timedelta
-from typing import Dict, List, Optional
-from concurrent.futures import ThreadPoolExecutor
-from DataProcessing.processors import DataProcessor
+from typing import Dict, List, Optional, Union
+import pandas_ta as ta
+
+from sklearn.preprocessing import MinMaxScaler
 
 
 class OHLCVMinMaxScaler:
@@ -19,128 +16,82 @@ class OHLCVMinMaxScaler:
         self.max_val = None
         self.volume_scaler = MinMaxScaler()
 
-    def fit(self, X: pd.DataFrame, low:str ='low', high:str='high'):
+    def fit(self, dataframe: pd.DataFrame, low: str = 'low', high: str = 'high'):
         # Fit self
-        self.min_val = X[low].min(axis=0)
-        self.max_val = X[high].max(axis=0)
+        self.min_val = dataframe[low].min(axis=0)
+        self.max_val = dataframe[high].max(axis=0)
         # Fit volume_scaler
-        self.volume_scaler.fit(X=X.volume)
+        self.volume_scaler.fit(X=dataframe.volume.values.reshape(-1, 1))
 
-    def transform(self, X: pd.DataFrame):
-        # Split to OHLC
-        ohlc_df = X[['open', 'close', 'high', 'low']]
+    def transform(self, dataframe: pd.DataFrame):
+        # Split to data
+        ohlc_df = dataframe.drop(['volume'], axis=1)
+        volume_df = dataframe[['volume']]
+
+        # Scale down OHLC data
         ohlc_normalized = (ohlc_df - self.min_val) / (self.max_val - self.min_val)
         ohlc_scaled = ohlc_normalized * (self.feature_range[1] - self.feature_range[0]) + self.feature_range[0]
+
         ohlc_scaled_df = pd.DataFrame(ohlc_scaled,
                                       columns=ohlc_df.columns,
-                                      index=X.index)
+                                      index=dataframe.index)
+
         # Split to volume
-        volume_df = X[['volume']]
-        volume_scaled = self.volume_scaler.transform(volume_df)
+        volume_scaled = self.volume_scaler.transform(volume_df.values.reshape(-1, 1))
         volume_scaled_df = pd.DataFrame(volume_scaled,
                                         columns=['volume'],
-                                        index=X.index)
+                                        index=dataframe.index)
 
-        return pd.concat([ohlc_scaled_df, volume_scaled_df], axis=1)
+        out = pd.concat([ohlc_scaled_df, volume_scaled_df], axis=1)
+        return out[sorted(out.columns)]
 
-    def fit_transform(self, X: pd.DataFrame):
-        self.fit(X)
-        return self.transform(X)
+    def fit_transform(self, dataframe: pd.DataFrame):
+        self.fit(dataframe=dataframe)
+        return self.transform(dataframe=dataframe)
 
 
 class DataStream:
-    def __init__(self, ticker: str,
+    def __init__(self,
+                 ticker: str,
                  timeframes: list,
-                 data_processor_type: DataProcessor,
-                 technicals: List[str],
-                 processor_window_output: int,
-                 test: bool = False,
+                 output_window_length: int,
+                 ma_lengths: Optional[list] = None,
                  data_split: Optional[float] = 0.9,
-                 data_size: Optional[int] = None):
-        self.test: bool = test
-        self.ticker: str = ticker
-        self.dataframe: pd.DataFrame = None
+                 ):
+        self.test: bool = ticker == 'test'
+        self.ticker: str = ticker.upper()
         self.step_size: int = min(timeframes)
-        self.timeframes: list = sorted(timeframes)
-        self.technicals: list = technicals
-        self.processor_window_output: int = processor_window_output
-        self.data_processor_type: DataProcessor = data_processor_type
-        self.data_processors: Dict[int, DataProcessor] = None
-        self.data_window_size = int((max(self.timeframes) / self.step_size) * self.processor_window_output) * 2
-        self.data_size: int = data_size
+        self.dataframe: pd.DataFrame = None
+        self.timeframes: Dict[int, pd.DataFrame] = dict(zip(sorted(timeframes), [None] * len(timeframes)))
+        self.output_window_length: int = output_window_length
         self.data_split: float = data_split
-        self.ohlc_scaler = OHLCVMinMaxScaler()
-        # Initialize functions
+        self.ma_lengths: List[int] = [5, 10, 20, 40, 80] if ma_lengths is None else ma_lengths
+
         self._load_csv_data()
         self._clean_dataframe()
-        # self._add_technicals()
-
-        if self.data_size:
-            self.dataframe = self.dataframe.iloc[-self.data_size:]
-
-        self.processors: List[DataProcessor] = []
-        self.split_index: int = int(len(self.dataframe) * self.data_split) if self.data_split else len(self.dataframe)
-
-    def run_single_timeframe(self, interval: int) -> DataProcessor:
-
-        data_processor = self.data_processor_type(timeframe=interval, window=self.processor_window_output)
-
-        for key, window_start in tqdm(enumerate(range(self.data_window_size, self.split_index)),
-                                      desc=f"{interval}_train",
-                                      position=self.timeframes.index(interval),
-                                      leave=False,
-                                      ncols=100):
-            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
-            data_processor.process_train_data(key=key, data_window=window)
-
-        for key, window_start in tqdm(enumerate(range(self.split_index, len(self.dataframe))),
-                                      desc=f"{interval}_test",
-                                      position=self.timeframes.index(interval),
-                                      leave=False,
-                                      ncols=100):
-            window = self.dataframe.iloc[window_start - self.data_window_size: window_start]
-            data_processor.process_test_data(key=key, data_window=window)
-
-        return data_processor
-
-    def run_multithread(self) -> None:
-        with Pool(3) as pool:
-            for result in pool.imap_unordered(self.run_single_timeframe, self.timeframes):
-                self.processors.append(result)
-
-        self.data_processors = {processor.timeframe: processor for processor in self.processors}
-
-    def get_hindsight_data(self, current_step: int, horizon: int) -> pd.DataFrame:
-        """
-        Returns data from the future for training purposes (hindsight rewards).
-        :param current_step: int - current step in the data stream
-        :param horizon: int - number of steps into the future
-        :return: pd.DataFrame - data from the future
-        """
-        return self.data_processors[self.step_size].train_data[current_step + horizon]
-
-    def save_datastream(self):
-        path = f'data_streams/{"_".join(map(str, self.timeframes))}'
-        filename = f'{self.ticker}_window{self.processor_window_output}.data_stream'
-        if self.data_size:
-            path += f"_data{self.data_size}"
-        Utils.save_object(object_to_save=self, path=path, filename=filename)
-
-    def max_steps(self, data_type='train') -> int:
-        if data_type == 'train':
-            return len(self.data_processors[self.step_size].train_data.keys()) - self.data_window_size - 1
-        return len(self.data_processors[self.step_size].test_data.keys()) - 1
+        print()
+        self.prepare_all_timeframes()
+        print()
+        self.generator = DataGenerator(timeframes=self.timeframes,
+                                       output=self.output_window_length)
 
     def _load_csv_data(self) -> None:
-        self.step_size = min(self.timeframes)
-        path = f'/Users/milosz/Documents/Pycharm/InanceAlgo/Datasets/forex/intraday/{self.ticker}.csv'
-        df = pd.read_csv(path, parse_dates=['Datetime'], index_col='Datetime')
-        df = df.groupby(pd.Grouper(freq=f'{self.step_size}T')).agg({'open': 'first',
-                                                                    'close': 'last',
-                                                                    'low': 'min',
-                                                                    'high': 'max',
-                                                                    'volume': 'sum'})
-        self.dataframe = df
+        if self.ticker == 'TEST':
+            path = 'EURUSD_short.csv'
+        else:
+            path = f'/Users/milosz/Documents/Pycharm/InanceAlgo/Datasets/forex/intraday/{self.ticker}.csv'
+        self.dataframe = pd.read_csv(path,
+                                     parse_dates=True,
+                                     index_col='Datetime')
+        self.dataframe = self.dataframe.groupby(
+            pd.Grouper(freq=f'{self.step_size}T')).agg({'open': 'first',
+                                                        'close': 'last',
+                                                        'low': 'min',
+                                                        'high': 'max',
+                                                        'volume': 'sum'})
+
+        # if self.test:
+        #     print(f"Data loaded: {self.dataframe.shape}")
 
     def _clean_dataframe(self) -> None:
         # Adjust to Amsterdam time
@@ -153,24 +104,55 @@ class DataStream:
         self.dataframe.dropna(axis=0, inplace=True)
         self.dataframe.drop(columns=['forex_open'], axis=0, inplace=True)
 
-        # OHLC Scaler
-        ohlc_df = self.dataframe[['open', 'close', 'high', 'low']]
-        ohlc_df = pd.DataFrame(self.ohlc_scaler.fit_transform(ohlc_df),
-                               columns=ohlc_df.columns,
-                               index=ohlc_df.index)
-        # Volume scaler
-        volume_df = self.dataframe[['volume']]
-        ohlc_df = pd.DataFrame(self.volume_scaler.fit_transform(self.dataframe[['volume']]),
-                               columns=volume_df.columns,
-                               index=volume_df.index)
+        # if self.test:
+        #     print(f"Data cleaned: {self.dataframe.shape}")
 
-        # Merge the scaled versions
-        self.dataframe = pd.concat([ohlc_df, volume_df], axis=1)
+    def _prepare_timeframe(self, timeframe: int) -> None:
+        # Group data to fit the frame
+        price_data = self.dataframe.groupby(pd.Grouper(freq=f'{timeframe}T')).agg(
+            {
+                'open': 'first',
+                'close': 'last',
+                'low': 'min',
+                'high': 'max',
+                'volume': 'sum',
+            })
+        # Drop NaN values
+        price_data = price_data.dropna(axis=0)
 
-    def info(self) -> None:
-        print(self.__repr__())
-        print('train_max_steps', self.max_steps(data_type='train'))
-        print('test_max_steps', self.max_steps(data_type='test'))
+        # Scale the data fit the data scaler
+        data_scaler = OHLCVMinMaxScaler()
+        data_scaled = data_scaler.fit_transform(dataframe=price_data)
+        data_scaled.columns = [f'scaled_{column}' for column in data_scaled.columns]
+
+        # Calculate moving averages
+        target_labels = ['close']
+
+        for label in target_labels:
+            for ma_length in self.ma_lengths:
+                data_scaled[f'scaled_{label}_{ma_length}'] = ta.hma(length=ma_length,
+                                                                    close=data_scaled[f"scaled_{label}"])
+                data_scaled[f'scaled_{label}_{ma_length}_diff'] = data_scaled[f'scaled_{label}_{ma_length}'].diff()
+
+        data_scaled = data_scaled.dropna(axis=0)
+        price_data['datetime'] = price_data.index
+
+        price_data.columns = [f'{timeframe}_{column}' for column in price_data.columns]
+        data_scaled.columns = [f'{timeframe}_{column}' for column in data_scaled.columns]
+
+        price_data = price_data.loc[data_scaled.index[0]:data_scaled.index[-1]]
+
+        if timeframe == self.step_size:
+            self.timeframes[timeframe] = pd.concat([price_data, data_scaled], axis=1)
+        else:
+            self.timeframes[timeframe] = data_scaled
+
+        if self.test:
+            print(f'TF: {timeframe} - TF_shape: {self.timeframes[timeframe].shape}')
+
+    def prepare_all_timeframes(self):
+        with ThreadPoolExecutor(max_workers=len(list(self.timeframes.keys()))) as executor:
+            executor.map(self._prepare_timeframe, list(self.timeframes.keys()))
 
     @staticmethod
     def _is_forex_day(row: pd.DataFrame) -> bool:
@@ -186,13 +168,44 @@ class DataStream:
         else:
             return False
 
-    @staticmethod
-    def load_datastream(path: str):
-        return Utils.load_object(path=path, filename=None)
+    @property
+    def length(self):
+        return self.timeframes[self.step_size].shape[0]
 
-    def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}: ' \
-               f'\nprocessors={self.data_processors}'
+    def info(self) -> None:
+        print('DataStream:')
+        for tf, data in self.timeframes.items():
+            print(f"\nTF: {tf} Shape: {data.shape}")
 
-    def __getitem__(self, key: str) -> Dict[int, DataProcessor]:
-        return {timeframe: dataprocessor[key] for timeframe, dataprocessor in self.data_processors.items()}
+
+class DataGenerator:
+    def __init__(self, timeframes: Dict[int, pd.DataFrame], output: int):
+        self.timeframes: Dict[int, pd.DataFrame] = timeframes
+        self.output: int = output
+        self.step_size = min(self.timeframes.keys())
+        self.max_timeframe = max(self.timeframes.keys())
+        self.start_date = None
+        self.cursor = None
+        self.pick_start_date()
+
+    def pick_start_date(self):
+        self.start_date = self.timeframes[self.max_timeframe].index[self.output]
+        self.cursor = self.start_date + timedelta(minutes=self.max_timeframe)
+
+    def __getitem__(self, item: pd.Timestamp) -> pd.DataFrame:
+        out = []
+        for timeframe in self.timeframes.keys():
+            end_index, start_index = self.timeframes[timeframe].index.get_indexer(
+                [item, item - timedelta(minutes=self.output * timeframe)], method='ffill')
+            temp_df = self.timeframes[timeframe].iloc[start_index:end_index].copy()
+
+            if timeframe != self.step_size:
+                temp_df[f'{timeframe}_update'] = item.minute % timeframe == 0
+
+            out.append(temp_df)
+
+        out = [df.reset_index(drop=True) for df in out]
+        return pd.concat(out, axis=1)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}: max_timeframe={self.max_timeframe} start_date={self.start_date}"

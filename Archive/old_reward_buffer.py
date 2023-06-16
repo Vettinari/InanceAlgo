@@ -2,8 +2,7 @@ from pprint import pprint
 from typing import Optional, List
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
-from positions import Position
+from Archive.positions import Position
 
 
 class Reward:

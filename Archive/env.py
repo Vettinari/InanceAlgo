@@ -1,6 +1,5 @@
 import collections
 from datetime import timedelta
-from pprint import pprint
 from typing import Tuple, Optional, Dict
 import gymnasium
 import numpy as np
@@ -8,13 +7,12 @@ import pandas as pd
 import wandb
 from gym.core import ObsType
 from gymnasium import spaces
-from sklearn.preprocessing import MinMaxScaler
 import dill
 
 from DataProcessing.data_stream import DataStream
-from DataProcessing.ohlct import OHLCT
-from reward_buffer import RewardBuffer
-from risk_manager import RiskManager
+from Archive.ohlct import OHLCT
+from Archive.reward_buffer import RewardBuffer
+from Archive.risk_manager import RiskManager
 
 
 class TradeGym(gymnasium.Env):

@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import timedelta
 from typing import Dict, Union, Optional
 
-from DataProcessing.timeframe import TimeFrame, OHLCT
+from Archive.timeframe import TimeFrame, OHLCT
 
 
 class DataPipeline:
