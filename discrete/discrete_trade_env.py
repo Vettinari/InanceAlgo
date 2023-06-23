@@ -40,7 +40,7 @@ class DiscreteTradingEnv(gymnasium.Env):
 
         # Current data
         self.current_step: int = 0
-        self.current_date: pd.Timestamp = self.datastream.generator.cursor
+        self.current_date: pd.Timestamp = self.datastream.generator.start_cursor
         self.current_state: np.array = None
         self.current_price: float = 0
         self.balance: float = self.initial_balance
@@ -51,7 +51,7 @@ class DiscreteTradingEnv(gymnasium.Env):
     def reset(self, **kwargs):
         self.reward = 0
         self.current_step = 0
-        self.current_date = self.datastream.generator.cursor
+        self.current_date = self.datastream.generator.start_cursor
         self.current_price = 0
         self.positions: List[DiscretePosition] = []
         self.balance: float = self.initial_balance

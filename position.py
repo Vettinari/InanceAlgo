@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import pandas as pd
 from xtb import XTB
@@ -25,8 +25,24 @@ class ContinuousPosition:
         self.one_pip: float = XTB[ticker]['one_pip']
         self.one_lot_value = XTB[ticker]['one_lot_value']
 
-    def modify_position(self, current_price, volume) -> float:
-        if volume > 0:
+    def check_position(self, current_price, volume):
+        pass
+
+    def modify_position(self, current_price: float, volume: float) -> float:
+        """Modify the current ContinuousPosition.
+
+        Given a current_price and volume position changes.
+        If the volume is positive agent buys lots if negative he sells them.
+
+        Parameters:
+            current_price (float): Current price at selected step_size timeframe.
+            volume (float): Amount of the lots the agent wants to acquire/sell.
+
+        Returns:
+            float: The amount to update the balance of the ContinuousEnvironment
+        """
+        volume = round(volume, 2)
+        if volume > 0:  # Agent is increasing his biased position
             total_value = (self.total_volume * self.avg_price) + (volume * current_price)
             self.total_volume = round(self.total_volume + volume, 3)
             self.avg_price = round(total_value / self.total_volume, 4)
@@ -36,7 +52,7 @@ class ContinuousPosition:
             self.position_margin = round(self.position_margin + margin, 2)
             return -margin
 
-        elif volume < 0:
+        elif volume < 0:  # Agent is decreasing his biased position
             profit = self.calculate_profit(current_price=current_price, volume=abs(volume))
             margin_released = round((abs(volume) * self.one_lot_value) / self.leverage, 2)
 
@@ -91,6 +107,14 @@ class ContinuousPosition:
             "total_volume": self.total_volume,
             "avg_price": self.avg_price
         }
+
+    @property
+    def state(self) -> List[float]:
+        """Return position state.
+        Returns:
+            list: [profit, position_margin, total_volume]
+        """
+        return [self.profit, self.position_margin, self.total_volume]
 
 
 class DiscretePosition:

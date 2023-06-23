@@ -29,7 +29,7 @@ class ContinuousTradingEnv(gymnasium.Env):
 
         # Current data
         self.current_step: int = 0
-        self.current_date: pd.Timestamp = self.datastream.generator.cursor
+        self.current_date: pd.Timestamp = self.datastream.generator.start_cursor
         self.current_state: np.array = None
         self.current_price: float = 0
         self.current_ohlc: Dict[str, float] = None
@@ -42,14 +42,16 @@ class ContinuousTradingEnv(gymnasium.Env):
         self.reset()
 
     def reset(self, **kwargs):
+        self.done = False
         self.reward = 0
         self.current_step = 0
-        self.current_date = self.datastream.generator.cursor
+        self.current_date = self.datastream.generator.start_cursor
         self.current_price = 0
         self.position: ContinuousPosition = ContinuousPosition(ticker='EURUSD' if self.test else self.datastream.ticker,
                                                                order_type=self.agent_bias)
         self.balance: float = self.initial_balance
         self.history = pd.DataFrame(columns=ContinuousPosition.__dict__, index=[])
+        # Generate state after restarting
         self.current_state = self.update_state_price_positions()
 
     @property
@@ -71,7 +73,15 @@ class ContinuousTradingEnv(gymnasium.Env):
     def is_done(self):
         return self.current_step >= self.datastream.length or self.total_balance <= 0
 
-    def update_state_price_positions(self):
+    def update_state_price_positions(self) -> np.array():
+        """
+        Updates current_price, current_ohlc and generates new state.
+        It is important to update the data in datastream generator
+        with new date.
+
+        Returns: State in np.array.
+        """
+
         data = self.datastream.generator[self.current_date]
         price_data = data[data.columns[:6]]
         self.current_price = price_data.iloc[-1][f'{self.datastream.step_size}_close']
@@ -81,7 +91,7 @@ class ContinuousTradingEnv(gymnasium.Env):
 
         scaled_data = data[data.columns[6:]]
 
-        state = np.hstack([self.total_balance, self.position_profit, *scaled_data.values])
+        state = np.hstack([self.total_balance, self.position.state, *scaled_data.values])
 
         return state
 
