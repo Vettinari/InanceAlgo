@@ -8,6 +8,10 @@ from DataProcessing.datastream import DataStream
 from positions.continuous import ContinuousPosition
 from xtb import XTB
 
+ENV_COLS = ['step', 'balance', 'reward', 'date', 'action']
+LOG_COLS = list(ContinuousPosition(order_type='short', ticker='EURUSD', scaler=0.0000001).log_info(
+    current_price=0).keys()) + ENV_COLS
+
 
 class ContinuousTradingEnv(gym.Env):
     def __init__(self,
@@ -31,7 +35,7 @@ class ContinuousTradingEnv(gym.Env):
             'spread']
         self.pip_value: float = XTB['EURUSD']['one_pip'] if self.datastream.ticker == 'TEST' else \
             XTB[self.datastream.ticker]['one_pip']
-        self.history: pd.DataFrame = pd.DataFrame(columns=ContinuousPosition.__dict__, index=[])
+        self.history: pd.DataFrame = pd.DataFrame(columns=LOG_COLS, index=[])
 
         # Current data
         self.done = False
@@ -70,7 +74,7 @@ class ContinuousTradingEnv(gym.Env):
                                            order_type=self.agent_bias,
                                            scaler=self.scaler)
         self.balance: float = self.initial_balance
-        self.history = pd.DataFrame(columns=ContinuousPosition.__dict__, index=[])
+        self.history = pd.DataFrame(columns=LOG_COLS, index=[])
         # Generate state after restarting
         self.current_state = self.update_state_price_positions()
 
@@ -132,24 +136,21 @@ class ContinuousTradingEnv(gym.Env):
             pass
         return balance_reward
 
-    def validate_action(self, action: float) -> bool:
-        sell_zero_flag = action < 0 and self.position.total_volume == 0
-        buy_without_enough_cash_flag = self.cash_in_hand < self.position.required_margin(volume=action)
-        sell_more_than_own_flag = action < 0 and abs(action) > self.position.total_volume
-        return sell_zero_flag or buy_without_enough_cash_flag or sell_more_than_own_flag
-
     def step(self, action: float):
         self.current_action = action
 
-        previous_balance = self.total_balance
+        # Update history
+        self.history.loc[self.current_step] = self.log_info()
 
-        # Apply action masking
-        if self.validate_action(action):  # Invalid action, skip the step and return the current state with 0 reward
-            self.reward = self.bad_action_penalty
-            return self.current_state, self.reward, self.done, {}
+        # Apply action masking.
+        if self.position.validate_action(action=action, cash_in_hand=self.cash_in_hand):
+            return self.current_state, self.bad_action_penalty, self.done, {}
+
+        previous_balance = self.total_balance
 
         # Determine current action
         self.modify_position(volume=action)
+
         # Increase step and date.
         self.current_step += 1
         self.current_date += timedelta(minutes=self.datastream.step_size)
@@ -157,9 +158,6 @@ class ContinuousTradingEnv(gym.Env):
         self.current_state = self.update_state_price_positions()
         # Calculate the reward
         self.reward = self.calculate_reward(previous_balance=previous_balance)
-
-        # Update history
-        self.history.loc[self.current_step] = self.__dict__
 
         self.done = self.is_done()
 
@@ -180,11 +178,14 @@ class ContinuousTradingEnv(gym.Env):
     def render(self, mode='human'):
         pass
 
-    def __dict__(self) -> dict:
+    def log_info(self):
         out = {
             'step': self.current_step,
-            'action': self.current_action,
             'balance': self.total_balance,
+            'date': self.current_date,
             'reward': self.reward,
+            'action': self.current_action
         }
-        return out.update(self.position.__dict__)
+        out.update(self.position.log_info(current_price=self.current_price))
+
+        return out
