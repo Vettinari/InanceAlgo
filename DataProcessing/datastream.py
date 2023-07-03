@@ -77,12 +77,14 @@ class DataStream:
         self.ma_type = 'sma' if ma_type is None else ma_type
         self.momentums: List[int] = momentums
         self.momentum_noise_reduction = 4 if momentum_noise_reduction is None else momentum_noise_reduction
-        self.local_extreme_orders: List[int] = local_extreme_orders
+        self.local_extreme_orders = local_extreme_orders
 
         self._load_csv_data()
         self._clean_dataframe()
         self.prepare_all_timeframes()
-        self.generator = DataGenerator(timeframes=self.timeframes, output=self.output_window_length)
+        self.generator = DataGenerator(timeframes=self.timeframes,
+                                       output=self.output_window_length,
+                                       extreme_orders=self.local_extreme_orders)
 
     def _load_csv_data(self) -> None:
         if self.ticker == 'TEST':
@@ -161,16 +163,16 @@ class DataStream:
             # Drop nan values due to moving averages and momentum calculations
             data_scaled = data_scaled.dropna(axis=0)
 
-        # Calculate local extreme with different filters
-        if self.local_extreme_orders is not None:
-            for order in self.local_extreme_orders:
-                self.local_extrema(df=data_scaled,
-                                   order=order,
-                                   low_col='scaled_low',
-                                   high_col='scaled_high')
-            if self.test:
-                extreme_cols = set(data_scaled.columns) - scaled_cols - moving_avg_cols - momentum_cols
-                print('Extreme cols:\n', *extreme_cols)
+        # # Calculate local extreme with different filters
+        # if self.local_extreme_orders is not None:
+        #     for order in self.local_extreme_orders:
+        #         self.local_extrema(df=data_scaled,
+        #                            order=order,
+        #                            low_col='scaled_low',
+        #                            high_col='scaled_high')
+        #     if self.test:
+        #         extreme_cols = set(data_scaled.columns) - scaled_cols - moving_avg_cols - momentum_cols
+        #         print('Extreme cols:\n', *extreme_cols)
 
         # Drop nan values due to moving averages and momentum calculations
         data_scaled = data_scaled.dropna(axis=0)
@@ -220,26 +222,16 @@ class DataStream:
         for tf, data in self.timeframes.items():
             print(f"\nTF: {tf} Shape: {data.shape}")
 
-    @staticmethod
-    def local_extrema(df: pd.DataFrame, low_col: str = 'low', high_col: str = 'high', order: int = 3):
-        # Local max
-        highs = df.iloc[argrelextrema(df[high_col].values, np.greater_equal, order=order)[0]][high_col].notnull()
-        df[f'{high_col}_max_{order}'] = highs
-        # Local min
-        lows = df.iloc[argrelextrema(df[low_col].values, np.less_equal, order=order)[0]][low_col].notnull()
-        df[f'{low_col}_min_{order}'] = lows
-
-        df[f'{high_col}_max_{order}'] = df[f'{high_col}_max_{order}'].map({np.NaN: 0, True: 1})
-        df[f'{low_col}_min_{order}'] = df[f'{low_col}_min_{order}'].map({np.NaN: 0, True: 1})
-
 
 class DataGenerator:
-    def __init__(self, timeframes: Dict[int, pd.DataFrame], output: int):
+    def __init__(self, timeframes: Dict[int, pd.DataFrame], output: int,
+                 extreme_orders: Optional[List[int]] = None):
         self.timeframes: Dict[int, pd.DataFrame] = timeframes
         self.output: int = output
         self.step_size = min(self.timeframes.keys())
         self.max_timeframe = max(self.timeframes.keys())
         self.start_cursor = None
+        self.extreme_orders = extreme_orders
         self.pick_start_date()
 
     def pick_start_date(self):
@@ -255,10 +247,28 @@ class DataGenerator:
             if timeframe != self.step_size:
                 temp_df[f'{timeframe}_update'] = 1 if item.minute % timeframe == 0 else 0
 
-            out.append(temp_df)
+            for order in self.extreme_orders:
+                self.local_extrema(df=temp_df,
+                                   order=order,
+                                   low_col=f'{timeframe}_scaled_low',
+                                   high_col=f'{timeframe}_scaled_high')
+            out.append(temp_df.reset_index(drop=True))
 
-        out = [df.reset_index(drop=True) for df in out]
         return pd.concat(out, axis=1)
 
     def __repr__(self):
         return f"{self.__class__.__name__}: max_timeframe={self.max_timeframe} start_date={self.start_cursor}"
+
+    def local_extrema(self, df: pd.DataFrame, order: int, low_col: str = 'low', high_col: str = 'high'):
+        # Local max
+        highs = df.iloc[argrelextrema(df[high_col].values, np.greater_equal, order=order)[0]][high_col].notnull()
+        df[f'{high_col}_max_{order}'] = highs
+        # Local min
+        lows = df.iloc[argrelextrema(df[low_col].values, np.less_equal, order=order)[0]][low_col].notnull()
+        df[f'{low_col}_min_{order}'] = lows
+
+        df[f'{high_col}_max_{order}'] = df[f'{high_col}_max_{order}'].map({np.NaN: 0, True: 1})
+        df[f'{low_col}_min_{order}'] = df[f'{low_col}_min_{order}'].map({np.NaN: 0, True: 1})
+
+        df.loc[df.index[-1], f'{high_col}_max_{order}'] = 0
+        df.loc[df.index[-1], f'{low_col}_min_{order}'] = 0

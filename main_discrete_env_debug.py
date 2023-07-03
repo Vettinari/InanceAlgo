@@ -1,11 +1,9 @@
-from datetime import timedelta
-
 import numpy as np
 import pandas as pd
 import torch
 
 from DataProcessing.datastream import DataStream
-from trade_env import DiscreteTradingEnv
+from envs.discrete import DiscreteTradingEnv
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -20,18 +18,21 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 if __name__ == '__main__':
     datastream = DataStream(ticker='test',
-                            timeframes=[15, 30],
-                            output_window_length=2,
-                            data_split=0.9,
-                            ma_lengths=[5])
+                            timeframes=[5],
+                            output_window_length=10,
+                            ma_lengths=[5, 10, 15, 20],
+                            momentums=[4, 8, 12],
+                            momentum_noise_reduction=4,
+                            local_extreme_orders=[],
+                            data_split=0.8,
+                            ma_type='sma',
+                            )
 
     env = DiscreteTradingEnv(datastream=datastream,
-                             stop_loss_pips=80,
-                             stop_profit_pips=20,
                              initial_balance=10000,
-                             risk=0.1,
                              test=True)
 
-    while True:main_env_debug.py
-        action = int(input("Choose action:"))
+    while True:
+        action = float(input("Type action"))
         env.step(action=action)
+        print(env.current_state)
