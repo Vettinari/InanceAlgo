@@ -35,4 +35,3 @@ if __name__ == '__main__':
     while True:
         action = float(input("Type action"))
         env.step(action=action)
-        print(env.current_state)

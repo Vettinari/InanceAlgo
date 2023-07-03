@@ -159,7 +159,7 @@ class ContinuousTradingEnv(gym.Env):
         self.reward = self.calculate_reward(previous_balance=previous_balance)
 
         # Update history
-        self.history.loc[self.current_step] = self.__dict__()
+        self.history.loc[self.current_step] = self.__dict__
 
         self.done = self.is_done()
 
@@ -172,7 +172,10 @@ class ContinuousTradingEnv(gym.Env):
         return self.current_state, self.reward, self.done, {}
 
     def current_info(self):
-        print(f"Current price:", self.current_price, "Balance:", self.total_balance, "Reward:", self.reward)
+        print(f"Current price:", self.current_price,
+              "Cash_in_hand:", self.cash_in_hand,
+              "Balance:", self.total_balance,
+              "Reward:", self.reward)
 
     def render(self, mode='human'):
         pass
