@@ -1,7 +1,7 @@
 from typing import Union
 
 import numpy as np
-import Utils
+from Utils import Utils
 import pandas as pd
 from Archive.ohlct import OHLCT
 from positions import Position, Long, Short

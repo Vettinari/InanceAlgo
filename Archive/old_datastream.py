@@ -1,9 +1,8 @@
 from multiprocessing import Pool
 
-import Utils
+from Utils import Utils
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 from datetime import timedelta
 from typing import Dict, List, Optional
 from sklearn.preprocessing import MinMaxScaler

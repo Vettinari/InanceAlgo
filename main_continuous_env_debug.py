@@ -3,19 +3,16 @@ from pprint import pprint
 import numpy as np
 import pandas as pd
 import torch
-
 from DataProcessing.datastream import DataStream
 from envs.biased.continuous import ContinuousTradingEnv
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-
 seed = 42
 np.random.seed(seed=seed)
 torch.manual_seed(seed=seed)
 np.set_printoptions(suppress=True)
-
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 if __name__ == '__main__':
@@ -38,4 +35,3 @@ if __name__ == '__main__':
     while True:
         action = float(input("Type volume amount"))
         env.step(action=action)
-        pprint(env.history.tail(1))

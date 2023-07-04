@@ -3,7 +3,7 @@ from typing import Callable
 
 import numpy as np
 
-import Utils
+from Utils import Utils
 from Archive.ohlct import OHLCT
 
 XTB = {"EURUSD": {"one_lot_value": 100000,

@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 
 from DataProcessing.datastream import DataStream
-from envs.discrete import DiscreteTradingEnv
+from envs.biased.discrete import DiscreteTradingEnv
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
