@@ -2,10 +2,9 @@ from datetime import timedelta
 import gym
 import numpy as np
 import pandas as pd
-from typing import Dict
+from typing import Dict, Optional, List
 
 from DataProcessing.datastream import DataStream
-from Archive.positions.discrete import DiscretePosition
 from Utils.xtb import XTB
 
 
@@ -13,6 +12,8 @@ class DiscreteTradingEnv(gym.Env):
     def __init__(self,
                  datastream: DataStream,
                  test: bool,
+                 agent_bias: str,
+                 manual_close: bool = False,
                  initial_balance=100000,
                  scale: bool = True,
                  stop_loss_pips: int = 80,
@@ -20,19 +21,21 @@ class DiscreteTradingEnv(gym.Env):
                  risk: float = 0.02):
         super().__init__()
         self.scaler = 0.0000001
+        self.manual_close = manual_close
         self.bad_action_penalty = -0.1
         self.scale = scale
         self.test: bool = test
         self.datastream: DataStream = datastream
         self.initial_balance: float = initial_balance
         self.current_action: float = None
+        self.agent_bias = agent_bias
         self.leverage: int = XTB['EURUSD']['leverage'] if self.datastream.ticker == 'TEST' else XTB[datastream.ticker][
             'leverage']
         self.spread: float = XTB['EURUSD']['spread'] if self.datastream.ticker == 'TEST' else XTB[datastream.ticker][
             'spread']
         self.pip_value: float = XTB['EURUSD']['one_pip'] if self.datastream.ticker == 'TEST' else \
             XTB[self.datastream.ticker]['one_pip']
-        self.history: pd.DataFrame = pd.DataFrame(columns=DiscretePosition.__dict__, index=[])
+        self.history: pd.DataFrame = pd.DataFrame(columns=DiscretePosition.log_info, index=[])
 
         # Current data
         self.done = False
@@ -129,25 +132,15 @@ class DiscreteTradingEnv(gym.Env):
             pass
         return balance_reward
 
-    def validate_action(self, action: float) -> bool:
-        return False
-
     def step(self, action: int):
         self.current_action = action
         previous_balance = self.total_balance
 
-        # Apply action masking
-        if self.validate_action(action):  # Invalid action, skip the step and return the current state with 0 reward
-            self.reward = self.bad_action_penalty
-            return self.current_state, self.reward, self.done, {}
-
         # Take action
-        if self.action_dict[action] == 'long':  # Long
-            self.open_position(position_type='long')
-
-        elif self.action_dict[action] == 'short':  # Short
-            self.open_position(position_type='short')
-
+        if self.action_dict[action] == 'open':  # Long
+            self.open_position(position_type=self.agent_bias)
+        elif self.action_dict[action] == 'close' and self.manual_close:  # Hold
+            pass
         elif self.action_dict[action] == 'hold':  # Hold
             pass
 
@@ -164,16 +157,7 @@ class DiscreteTradingEnv(gym.Env):
         # Calculate the reward
         self.reward = self.calculate_reward(previous_balance=previous_balance)
 
-        # Update history
-        self.history.loc[self.current_step] = self.__dict__()
-
         self.done = self.is_done()
-
-        if self.test:
-            print("Environment:")
-            self.current_info()
-            print("Position:")
-            self.position.info()
 
         return self.current_state, self.reward, self.done, {}
 
@@ -188,7 +172,7 @@ class DiscreteTradingEnv(gym.Env):
 
         self.balance -= self.position.open_position(open_price=current_price, position_type=position_type)
 
-    def current_info(self):
+    def info(self):
         print(f"Current price:", self.current_price, "Balance:", self.total_balance, "Reward:", self.reward)
 
     def render(self, mode='human'):
@@ -201,4 +185,168 @@ class DiscreteTradingEnv(gym.Env):
             'balance': self.total_balance,
             'reward': self.reward,
         }
-        return out.update(self.position.__dict__)
+        return out.update(self.position.log_info)
+
+
+class DiscretePosition:
+
+    def __init__(self,
+                 ticker: str,
+                 scaler: float,
+                 stop_loss_pips: int,
+                 stop_profit_pips: int,
+                 risk: int,
+                 manual_close: bool = False):
+        self.scaler: float = scaler
+        self.ticker: str = ticker
+        self._stop_loss_pips: int = stop_loss_pips
+        self._stop_profit_pips: int = stop_profit_pips
+        self.manual_close: bool = manual_close
+        self.risk: float = risk
+
+        # Calculated
+        self.leverage: int = XTB[ticker]['leverage']
+        self.one_pip: float = XTB[ticker]['one_pip']
+        self.one_lot_value: int = XTB[ticker]['one_lot_value']
+
+        # Position dynamic values
+        self.stop_loss: float = None
+        self.stop_profit: float = None
+        self.open_price: float = None
+        self.position_type: str = None
+        self.position_margin: float = None
+        self.volume: float = None
+        self.contract_value: float = None
+        self.status: str = None
+        self.trade_profit: float = None
+        self.pips_profit: int = None
+
+    def calculate_pip_profit(self, current_price: float) -> int:
+        """Returns the profit in pips given a current_price."""
+        out = (current_price - self.open_price) / self.one_pip if self.position_type == 'long' else \
+            (self.open_price - current_price) / self.one_pip
+
+        return int(out)
+
+    def calculate_trade_profit(self, current_price: float) -> float:
+        """Returns the profit in currency given a current_price."""
+        current_value = current_price * self.volume * self.one_lot_value
+        acquire_value = self.open_price * self.volume * self.one_lot_value
+        return current_value - acquire_value if self.position_type == 'long' else acquire_value - current_value
+
+    def check_stops(self, ohlc_dict: Dict[str, float]) -> Optional[dict]:
+        """Returns True and position history(dict) if the current price hits any stop."""
+
+        def _check_stop(stop, comparison):
+            return any(comparison(value, stop) for value in ohlc_dict.values())
+
+        # Check stop loss
+        hit_stop_loss = _check_stop(self.stop_loss, lambda x, y: x <= y if self.position_type == 'long' else x >= y)
+        if hit_stop_loss:
+            print("stop_loss")
+            self.status = 'stop_loss'
+            self.pips_profit = self._stop_loss_pips
+            self.trade_profit = self.risk
+            history = self.close_position()
+            return history
+
+        # Check stop profit
+        hit_stop_profit = _check_stop(self.stop_profit, lambda x, y: x >= y if self.position_type == 'long' else x <= y)
+        if hit_stop_profit:
+            print("stop_profit")
+            self.status = 'stop_profit'
+            self.pips_profit = self._stop_profit_pips
+            self.trade_profit = self.risk * (self._stop_profit_pips / self._stop_loss_pips)
+            history = self.close_position()
+            return history
+
+        return None
+
+    def close_position(self, manual_close_price: Optional[bool] = None) -> Dict[str, float]:
+        if manual_close_price:
+            self.status = "manual_close"
+            self.pips_profit = self.calculate_pip_profit(current_price=manual_close_price)
+            self.trade_profit = self.calculate_trade_profit(current_price=manual_close_price)
+
+        out = self.log_info().copy()
+        self.reset_position()
+        return out
+
+    def open_position(self, open_price: float, position_type: str) -> float:
+        """
+        Opens a position and returns margin that need to be reserved. Calculation of margin is based on the risk.
+        :param open_price: Current price
+        :param position_type: 'short' or 'long'
+        :return: Returns margin that need to be reserved.
+        """
+        self.status = 'open'
+        self.open_price = open_price
+        self.position_type = position_type
+        self._set_stop_loss()
+        self._set_stop_profit()
+        self.position_margin = self.required_margin(current_price=open_price)
+        return self.position_margin
+
+    def required_margin(self, current_price: float) -> float:
+        """
+        Calculates the required margin for a position given a current_price.
+        :param current_price: Current price
+        :return: Returns the required margin.
+        """
+        stop_loss = current_price - self._stop_loss_pips * self.one_pip if self.position_type == 'long' else \
+            current_price + self._stop_loss_pips * self.one_pip
+        self.volume = round(
+            (self.risk / ((current_price * self.one_lot_value) - (stop_loss * self.one_lot_value))) * current_price, 2)
+        self.contract_value = round(self.volume * self.one_lot_value, 2)
+        self.position_margin = round(self.contract_value / self.leverage, 2)
+        return self.position_margin
+
+    def _set_stop_loss(self):
+        self.stop_loss = self.open_price - (
+                self._stop_loss_pips * self.one_pip) if self.position_type == 'long' else self.open_price + (
+                self._stop_loss_pips * self.one_pip)
+
+    def _set_stop_profit(self):
+        self.stop_profit = self.open_price + (
+                self._stop_profit_pips * self.one_pip) if self.position_type == 'long' else self.open_price - (
+                self._stop_profit_pips * self.one_pip)
+
+    def reset_position(self):
+        self.stop_loss: float = None
+        self.stop_profit: float = None
+        self.open_price: float = None
+        self.position_type: str = None
+        self.position_margin: float = None
+        self.volume: float = None
+        self.contract_value: float = None
+        self.status: str = None
+        self.trade_profit: float = None
+        self.pips_profit: int = None
+
+    def state(self, current_price: float) -> Optional[List[float]]:
+        """
+        Returns the state of the position given a current_price. If manual_close is True, it will return the profit
+        and other metrics for agent to learn. Otherwise, it will return None as the environment will handle the closing.
+        :param current_price:
+        :return:
+        """
+        if self.manual_close:
+            return [
+                self.calculate_pip_profit(current_price=current_price)
+            ]
+        else:
+            return
+
+    def log_info(self, current_price: float) -> dict:
+        """
+        Return position as dictionary.
+        Returns:
+            dict of all position arguments that are important.
+        """
+        return {
+            "total_position_profit": self.total_position_profit(current_price=current_price),
+            "position_margin": self.position_margin,
+            "total_volume": self.total_volume,
+            "avg_price": self.avg_price,
+            "position_type": self.order_type
+        }

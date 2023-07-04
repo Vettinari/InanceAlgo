@@ -2,8 +2,8 @@ from datetime import timedelta
 import gym
 import numpy as np
 import pandas as pd
-from typing import Optional, List, Dict
 from DataProcessing.datastream import DataStream
+from typing import Dict, List, Optional
 from Utils.xtb import XTB
 
 
@@ -11,17 +11,16 @@ class ContinuousTradingEnv(gym.Env):
     def __init__(self,
                  datastream: DataStream,
                  test: bool,
-                 agent_bias: str,
                  initial_balance=100000,
                  scaler: Optional[float] = None):
         super().__init__()
-        self.test: bool = test
-        self.scaler = scaler
+        self.scaler = 0.0000001
         self.bad_action_penalty = -0.1
+        self.scaler = scaler
+        self.test: bool = test
         self.datastream: DataStream = datastream
         self.initial_balance: float = initial_balance
-        self.agent_bias: str = agent_bias
-
+        self.current_action: float = None
         self.leverage: int = XTB['EURUSD']['leverage'] if self.datastream.ticker == 'TEST' else XTB[datastream.ticker][
             'leverage']
         self.spread: float = XTB['EURUSD']['spread'] if self.datastream.ticker == 'TEST' else XTB[datastream.ticker][
@@ -39,8 +38,7 @@ class ContinuousTradingEnv(gym.Env):
         self.current_ohlc: Dict[str, float] = dict()
         self.current_extremes_data: pd.DataFrame = None
         self.balance: float = self.initial_balance
-        self.position: ContinuousPosition = ContinuousPosition(ticker='EURUSD' if self.test else self.datastream.ticker,
-                                                               order_type=self.agent_bias)
+        self.position: ContinuousPosition = ContinuousPosition(ticker='EURUSD' if self.test else self.datastream.ticker)
         self.reward = 0
         self.history_columns = list(self.log_info().keys()) + list(
             self.position.log_info(current_price=self.current_price).keys())
@@ -66,8 +64,7 @@ class ContinuousTradingEnv(gym.Env):
         self.current_ohlc: Dict[str, float] = dict()
         self.current_extremes_data: pd.DataFrame = None
         self.balance: float = self.initial_balance
-        self.position: ContinuousPosition = ContinuousPosition(ticker='EURUSD' if self.test else self.datastream.ticker,
-                                                               order_type=self.agent_bias)
+        self.position = ContinuousPosition(ticker='EURUSD' if self.test else self.datastream.ticker)
         self.history: pd.DataFrame = pd.DataFrame(columns=self.history_columns, index=[])
         self.reward = 0
         # Generate state after restarting
@@ -86,12 +83,7 @@ class ContinuousTradingEnv(gym.Env):
         return round(self.balance, 2)
 
     def modify_position(self, volume: float):
-        if self.agent_bias == 'long':
-            current_price = self.current_price + self.spread
-        else:
-            current_price = self.current_price - self.spread
-
-        self.balance += self.position.modify_position(current_price=current_price, volume=volume)
+        self.balance += self.position.modify_position(current_price=self.current_price, volume=volume)
 
     def is_done(self):
         return self.current_step >= self.datastream.length or self.total_balance <= 0
@@ -163,12 +155,14 @@ class ContinuousTradingEnv(gym.Env):
 
     def info(self):
         print("Step=", self.current_step,
-              "Cash_in_hand=", self.cash_in_hand,
-              "Balance=", self.total_balance,
-              "Current_ohlc=", self.current_ohlc,
+              "\nEnv_cash=", self.cash_in_hand,
+              "Env_Balance=", self.total_balance,
+              "\nP_profit=", self.position.profit,
+              "P_margin=", self.position.position_margin,
+              "P_volume=", self.position.total_volume,
               )
 
-    def log_info(self) -> dict:
+    def log_info(self):
         return {
             'step': self.current_step,
             'balance': self.total_balance,
@@ -181,10 +175,8 @@ class ContinuousTradingEnv(gym.Env):
 class ContinuousPosition:
 
     def __init__(self,
-                 order_type: str,
                  ticker: str):
         self.ticker: str = ticker
-        self.order_type: str = order_type.lower()
         self._order_number: Optional[str] = None
 
         # Continuous values
@@ -193,58 +185,97 @@ class ContinuousPosition:
         self.total_volume = 0
         self.avg_price: float = 0
         self.contract_value: float = 0
+        self.current_bias = 'neutral'
 
         # Calculated
         self.leverage: int = XTB[ticker]['leverage']
         self.one_pip: float = XTB[ticker]['one_pip']
         self.one_lot_value = XTB[ticker]['one_lot_value']
 
-    def modify_position(self, current_price: float, volume: float) -> float:
-        """Modify the current ContinuousPosition.
-
-        Given a current_price and volume position changes.
-        If the volume is positive agent buys lots if negative he sells them.
-
-        Parameters:
-            current_price (float): Current price at selected step_size timeframe.
-            volume (float): Amount of the lots the agent wants to acquire/sell.
-
-        Returns:
-            float: The amount to update the balance of the ContinuousEnvironment
+    def modify_position(self, current_price: float, volume: float):
         """
-        volume = round(volume, 2)  # Round down to 2 decimal places
-        if volume > 0:  # Agent is increasing his biased position
+        Modify the current ContinuousPosition.
+        """
+        delta_volume = round(self.total_volume + volume, 2)
+
+        # Decreasing longs
+        if self.total_volume > 0 > volume and delta_volume >= 0:
+            # print('Decreasing longs'.upper())
+            released_margin_and_profit = self.liquidate(current_price=current_price,
+                                                        volume=abs(volume),
+                                                        order_type='long')
+            return released_margin_and_profit
+        # Decreasing shorts
+        elif self.total_volume < 0 < volume and delta_volume <= 0:
+            # print('Decreasing shorts'.upper())
+            released_margin_and_profit = self.liquidate(current_price=current_price,
+                                                        volume=volume,
+                                                        order_type='short')
+            return released_margin_and_profit
+        # Liquidating shorts and buying longs
+        elif self.total_volume < 0 < delta_volume:
+            # print('Liquidating shorts and buying longs'.upper())
+            released_margin_and_profit = self.liquidate(current_price=current_price,
+                                                        volume=abs(self.total_volume),
+                                                        order_type='short')
+            required_margin = self.buy(current_price=current_price,
+                                       volume=delta_volume,
+                                       order_type='long')
+            return released_margin_and_profit - required_margin
+        # Liquidating longs and buying shorts
+        elif self.total_volume > 0 > delta_volume:
+            # print('Liquidating longs and buying shorts'.upper())
+            released_margin_and_profit = self.liquidate(current_price=current_price,
+                                                        volume=self.total_volume,
+                                                        order_type='long')
+            required_margin = self.buy(current_price=current_price,
+                                       volume=abs(delta_volume),
+                                       order_type='short')
+            return released_margin_and_profit - required_margin
+        # Increasing shorts
+        elif self.total_volume <= 0 and delta_volume < 0:
+            # print('INCREASE SHORTS')
+            required_margin = self.buy(current_price=current_price,
+                                       volume=abs(volume),
+                                       order_type='short')
+            return -required_margin
+        # Increasing longs
+        elif self.total_volume >= 0 and delta_volume > 0:
+            # print('INCREASE LONGS')
+            required_margin = self.buy(current_price=current_price,
+                                       volume=abs(volume),
+                                       order_type='long')
+            return -required_margin
+
+    def buy(self, current_price: float, volume: float, order_type: str):
+        if order_type == 'long':
             total_value = (self.total_volume * self.avg_price) + (volume * current_price)
             self.total_volume = round(self.total_volume + volume, 3)
-            self.avg_price = round(total_value / self.total_volume, 5)
+        else:
+            total_value = (abs(self.total_volume) * self.avg_price) + (abs(volume) * current_price)
+            self.total_volume = round(self.total_volume - volume, 3)
 
+        self.avg_price = round(total_value / abs(self.total_volume), 5)
+        self.contract_value = round(abs(self.total_volume) * self.one_lot_value, 2)
+        required_margin = round(self.required_margin(volume=abs(volume)), 2)
+        self.position_margin = round(self.position_margin + required_margin, 2)
+        # print('Buying', order_type, "with volume", volume, "margin_required", self.required_margin(volume=volume), )
+        return required_margin
+
+    def liquidate(self, current_price: float, volume: float, order_type: str):
+        margin_released = self.required_margin(volume=volume)
+        profit = self.trade_profit(current_price=current_price, volume=volume, order_type=order_type)
+
+        self.total_volume = round(abs(self.total_volume) - volume, 3)
+        if self.total_volume > 0:
+            self.position_margin = round(self.position_margin - margin_released, 2)
             self.contract_value = round(self.total_volume * self.one_lot_value, 2)
-
-            margin = self.required_margin(volume=volume)
-            self.position_margin = round(self.position_margin + margin, 2)
-            return -round(margin, 2)  # returns the margin required to open the position
-
-        elif volume < 0:  # Agent is decreasing his biased position
-            if volume < -self.total_volume:  # If agent wants to sell more than he has
-                volume = -self.total_volume
-
-            profit = self.trade_profit(current_price=current_price, volume=abs(volume))
-            margin_released = round((abs(volume) * self.one_lot_value) / self.leverage, 2)
-
-            self.total_volume = round(self.total_volume + volume, 3)
-
-            # If all shares are sold, average acquisition price becomes 0
-            if self.total_volume > 0:
-                self.position_margin = round(self.position_margin - margin_released, 2)
-                self.contract_value = round(self.total_volume * self.one_lot_value, 2)
-            else:
-                self.avg_price = 0
-                self.position_margin = 0
-                self.contract_value = 0
-
-            return round(margin_released + profit, 2)  # returns the margin released + profit
-        # Return 0 as no changes were made
-        return 0
+        else:
+            self.avg_price = 0
+            self.position_margin = 0
+            self.contract_value = 0
+        # print('Liquidating', order_type, "with volume", volume, "margin released", margin_released, "profit", profit)
+        return round(margin_released + profit, 2)  # returns the margin released + profit
 
     def required_margin(self, volume) -> float:
         """Return the required margin to open a position calculation based on the volume passed.
@@ -261,19 +292,19 @@ class ContinuousPosition:
         """
         if self.avg_price:
             out = (current_price - self.avg_price) / self.one_pip \
-                if self.order_type == 'long' else (self.avg_price - current_price) / self.one_pip
+                if self.total_volume >= 0 else (self.avg_price - current_price) / self.one_pip
             return round(out, 3)
         else:
             return 0
 
-    def trade_profit(self, current_price: float, volume: float) -> float:
+    def trade_profit(self, current_price: float, volume: float, order_type: str) -> float:
         """Returns real trade profit.
         Returns:
             float: Trade profit in currency.
         """
         cur_val = current_price * volume * self.one_lot_value  # Calculate the full contract value
         open_val = self.avg_price * volume * self.one_lot_value  # Calculate the open contract value
-        return round(cur_val - open_val, 2) if self.order_type == 'long' else round(open_val - cur_val, 2)
+        return round(cur_val - open_val, 3) if order_type == 'long' else round(open_val - cur_val, 3)
 
     def total_position_profit(self, current_price: float) -> float:
         """Returns real total profit.
@@ -281,23 +312,23 @@ class ContinuousPosition:
             float: Total profit in currency.
         """
         delta = round((current_price - self.avg_price) * self.total_volume * self.one_lot_value, 2)
-        return delta if self.order_type == 'long' else -delta
+        return delta if self.total_volume >= 0 else -delta
 
     def info(self) -> None:
         """
         Print position info.
         """
-        print(f'INFO: '
-              f'Order_type = {self.order_type.capitalize()}: '
-              f'Avg_price = {self.avg_price} '
-              f'Volume = {self.total_volume} '
-              f'Value = {self.contract_value} '
-              f'Margin = {self.position_margin}\n')
+        print(
+            f'INFO: '
+            f'Avg_price = {self.avg_price}, '
+            f'Volume = {self.total_volume}, '
+            f'Value = {self.contract_value}, '
+            f'Margin = {self.position_margin}')
 
     def state(self, current_price: float, scaler: float) -> List[float]:
         """Return position state.
         Returns:
-            list: [profit, position_margin, total_volume]
+            list: [pip_profit, position_margin, total_volume]
         """
         return [self.pip_profit(current_price=current_price) * scaler,
                 self.position_margin * scaler,
@@ -314,7 +345,7 @@ class ContinuousPosition:
             "position_margin": self.position_margin,
             "total_volume": self.total_volume,
             "avg_price": self.avg_price,
-            "position_type": self.order_type
+            "position_type": "long" if self.total_volume >= 0 else 'short'
         }
 
     def validate_action(self, action: float, cash_in_hand: float) -> bool:
@@ -323,8 +354,5 @@ class ContinuousPosition:
         Returns:
             True if the action is possible, False otherwise.
         """
-        # True if agent wants to sell more than he has
-        cannot_sell_flag = action < 0 and (self.total_volume == 0 or abs(action) > self.total_volume)
-        # True if agent wants to buy without enough cash
-        buy_without_enough_cash_flag = cash_in_hand < self.required_margin(volume=action)
-        return not (cannot_sell_flag or buy_without_enough_cash_flag)
+        enough_cash_flag = cash_in_hand >= round(self.required_margin(volume=abs(action)), 2)
+        return enough_cash_flag
