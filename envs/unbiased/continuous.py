@@ -127,9 +127,9 @@ class ContinuousTradingEnv(gym.Env):
         self.current_action = action
 
         # Update history
-        log = self.log_info()
-        log.update(self.position.log_info(current_price=self.current_price))
-        self.history.loc[self.current_step] = log
+        env_log = self.log_info()
+        env_log.update(self.position.log_info(current_price=self.current_price))
+        self.history.loc[self.current_step] = env_log
 
         # Apply action masking.
         if self.position.validate_action(action=action, cash_in_hand=self.cash_in_hand) is False:

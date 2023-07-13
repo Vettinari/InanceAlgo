@@ -7,6 +7,73 @@ from typing import Dict, List, Optional
 import pandas_ta as ta
 from scipy.signal import argrelextrema
 from sklearn.preprocessing import MinMaxScaler
+from tqdm import tqdm
+
+
+def identify_market_structure(df: pd.DataFrame, order_list: list, wave_like: bool = True) -> pd.DataFrame:
+    """
+    Identify market structure by finding local max and local min using argrelextrema from scipy.signal.
+    Then combine local max and local min into 'prime_wave' column.
+
+    :param df: Dataframe with 'high' and 'low' columns
+    :param order_list: List of integers for the order of local max and local min.
+    :param wave_like: Boolean for whether to engineer the local highs and lows into wave-like market structure.
+    :return: Dataframe with waves columns with different orders.
+    """
+
+    def update_df(df, index, order, value):
+        df.at[index, f'wave_{order}'] = value
+
+    def calculate_values(df, start, end, value_type):
+        vals = df.iloc[start + 1: end][value_type].values.tolist()
+        if not vals or vals[0] == vals[-1]:
+            val = np.NaN
+            idx = len(vals) + start + 1
+        else:
+            val = min(vals) if value_type == 'low' else max(vals)
+            idx = vals.index(val) + start + 1
+        return val, idx
+
+    market_structure_ranges = []
+
+    for order in order_list:
+        # Local max
+        df[f'local_max_{order}'] = df.iloc[argrelextrema(df['high'].values, np.greater_equal, order=order)[0]][
+            'high']
+        # Local min
+        df[f'local_min_{order}'] = df.iloc[argrelextrema(df['low'].values, np.less_equal, order=order)[0]]['low']
+        # Combine local_max and local_min into 'prime_wave'
+        df[f'wave_{order}'] = df[f'local_min_{order}'].combine_first(df[f'local_max_{order}']).astype(np.float32)
+
+        if wave_like:
+            last_type = None
+            last_index = None
+            df['is_high'] = df[f'local_max_{order}'] > 0
+            df['is_low'] = df[f'local_min_{order}'] > 0
+
+            for i, row in tqdm(df.iterrows()):
+                is_high = row['is_high']
+                is_low = row['is_low']
+
+                if is_high and last_type == 'high':
+                    val, idx = calculate_values(df, last_index, i, 'low')
+                    market_structure_ranges.append((last_index, last_index + idx))
+                    market_structure_ranges.append((last_index + idx, i))
+                    update_df(df, idx, order, val)
+
+                elif is_low and last_type == 'low':
+                    val, idx = calculate_values(df, last_index, i, 'high')
+                    market_structure_ranges.append((last_index, last_index + idx))
+                    market_structure_ranges.append((last_index + idx, i))
+                    update_df(df, idx, order, val)
+
+                if is_high or is_low:
+                    last_type = 'high' if is_high else 'low'
+                    market_structure_ranges.append((last_index, i))
+                    last_index = i
+
+        df.drop([f'local_min_{order}', f'local_max_{order}', 'is_high', 'is_low'], inplace=True, axis=1)
+    return df
 
 
 class OHLCVMinMaxScaler:
